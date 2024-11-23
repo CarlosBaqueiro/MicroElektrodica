@@ -71,12 +71,12 @@ class RateConstants:
 
     def constant(self, pre_exponential=1, experimental=1, chemical=0, electrical=0):
         """
-        Example class for demonstrating the calculation of a constant based on
+        Example class for demonstrating the calculation of a kinetics constant based on
         provided parameters.
-        :param pre_exponential:
-        :param experimental:
-        :param chemical:
-        :param electrical:
+        :param pre_exponential: Preexponential factor.
+        :param experimental: Experimental rate constant.
+        :param chemical: Chemical part of the rate constant.
+        :param electrical: Electrical part of the rate constant.
         :param parameters: Object with temperature attribute
         :type parameters: Object
         """
