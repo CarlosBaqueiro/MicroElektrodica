@@ -9,7 +9,9 @@
 |                                 | Catalyst Active surface area |   1.0 |  cm2  |
 |                                 | Volumetric flux              |   1.0 |  L/s  |
 | Rate Constants                  | --------------------------   |  ---- | ----  |
-| Pre-exponential                 | j* (or A)                    |   500 | A/cm2 |
+| Pre-exponential                 | A                            |     1 |       |
+|                                 | j*                           |  True |       |
+|                                 | j* (value)                   |   500 | A/cm2 |
 | Transition state theory         | kappa * k_B * T^m / h        | False |       |
 |                                 | kappa                        |     1 |       |
 |                                 | m                            |     1 |       |

@@ -153,6 +153,7 @@ class Hydrogen:
             'Atop': ('x', '-', h_atop)
         }
 
+        fname = os.path.join(directory, 'WangHydrogen_theta.png')
         plt.plot(self.operation.potential, self.melek_hb.results.theta, linestyle=':', color='#ff7f0e')
         plt.plot(self.operation.potential, self.melek_atop.results.theta, linestyle='-', color='#ff7f0e')
         for label, (mark, linest, data) in species.items():
@@ -177,7 +178,8 @@ class Hydrogen:
         plt.gca().add_artist(first_legend)
         plt.legend(handles=solutions_legend, loc='center right')
         plt.tight_layout()
-        plt.savefig('WangHydrogen_theta.png', dpi=300, bbox_inches='tight', format='png')
+        plt.xlim(0, 0.5)
+        plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
         currents = {
@@ -185,6 +187,7 @@ class Hydrogen:
             'Atop': ('x', '-', j_atop)
         }
 
+        fname = os.path.join(directory, 'WangHydrogen_j.png')
         plt.plot(self.operation.potential, self.melek_hb.results.j, linestyle=':', color='#ff7f0e')
         plt.plot(self.operation.potential, self.melek_atop.results.j, linestyle='-', color='#ff7f0e')
         for label, (mark, linest, data) in currents.items():
@@ -201,7 +204,7 @@ class Hydrogen:
         plt.gca().add_artist(first_legend)
         plt.legend(handles=solutions_legend, loc='lower right')
         plt.tight_layout()
-        plt.savefig('WangHydrogen_j.png', dpi=300, bbox_inches='tight', format='png')
+        plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
 
@@ -310,21 +313,22 @@ class Oxygen:
             'OH': ('s', '-', oh, 1),
             'O': ('o', '--', o, 0)
         }
+        colors = ['#ffd9bf', '#ffb380', '#ff8c40', '#ff7f0e', '#ff6610']
 
+        fname = os.path.join(directory, 'MooreOxygen_theta.png')
         for label, (mark, linest, data, idx) in species.items():
             plt.plot(data[:, 0] + 0.02, data[:, 1], marker=mark, linestyle='', color='#1f77b4')
 
-        colors = ['#ffd9bf', '#ffb380', '#ff8c40', '#ff7f0e', '#ff6610']
         co = np.array([0.01, 0.1, 0.5, 1, 5])
         j = np.zeros((len(self.operation.potential), len(co)))
-        presure_legend = []
+        pressure_legend = []
         for i in range(len(co)):
             self.data.species.c0_reactants = np.array([co[i], 1])
             self.melek = Calculator(self.data)
             plt.plot(self.operation.potential, self.melek.results.theta[:, 0], linestyle='--', color=colors[i])
             plt.plot(self.operation.potential, self.melek.results.theta[:, 1], linestyle='-', color=colors[i])
             j[:, i] = self.melek.results.j
-            presure_legend.append(Line2D([0], [0], linestyle='-', color=colors[i], label=fr'{co[i]} atm'))
+            pressure_legend.append(Line2D([0], [0], linestyle='-', color=colors[i], label=fr'{co[i]} atm'))
 
         plt.xlabel('Overpotential [V]')
         plt.ylabel(r'$\theta_i$')
@@ -342,16 +346,17 @@ class Oxygen:
         ]
 
         first_legend = plt.legend(handles=species_legend, loc='lower right')
-        second_legend = plt.legend(handles=presure_legend, loc='center right')
+        second_legend = plt.legend(handles=pressure_legend, loc='center right')
         plt.gca().add_artist(first_legend)
         plt.gca().add_artist(second_legend)
         plt.legend(handles=solutions_legend, loc='upper right')
         plt.ylim(0, 1)
-        plt.xlim(0.1, 0.8)
+        plt.xlim(0.1, 0.9)
         plt.tight_layout()
-        plt.savefig('MooreOxygen_theta.png', dpi=300, bbox_inches='tight', format='png')
+        plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
+        fname = os.path.join(directory, 'MooreOxygen_j.png')
         for i in range(len(co)):
             plt.plot(abs(j[:, i]), self.operation.potential, color=colors[i], label=f'{co[i]} atm')
 
@@ -359,13 +364,12 @@ class Oxygen:
         plt.ylabel('Overpotential [V]')
         plt.xscale('log')
         # plt.yscale('log')
-        plt.tight_layout()
         # plt.grid(visible=True, which='both', axis='both', color='grey', linestyle='-', linewidth='0.2')
         plt.legend(loc='lower right')
         plt.ylim(0.1, 0.9)
         plt.xlim(1e-7, 1e1)
         plt.tight_layout()
-        plt.savefig('MooreOxygen_j.png', dpi=300, bbox_inches='tight', format='png')
+        plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
         plt.show()
         
         
@@ -591,9 +595,9 @@ class Ethanol:
             'OH': ('tab:purple', oh, 4)
         }
 
+        fname = os.path.join(directory, 'SanchezEthanol_concentrations.png')
         plt.plot(self.operation.potential, self.melek_cstr.results.c_reactants[:,0], label=r'CH$_3$CH$_2$OH')
         plt.plot(self.operation.potential, self.melek_cstr.results.c_products[:,0], label=r'CH$_3$CHO')
-        #plt.plot(self.operation.potential, self.melek_cstr.results.c_products, label=self.species.products)
         plt.xlabel('Overpotential [V]')
         plt.ylabel(r'$c_i$')
         plt.xlim(0, 1)
@@ -601,15 +605,16 @@ class Ethanol:
         plt.minorticks_on()
         plt.tight_layout()
         plt.legend()
-        #plt.savefig('SanchezEthanol_concentrations.png', dpi=300, bbox_inches='tight', format='png')
+        plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
         plt.show()
 
+        fname = os.path.join(directory, 'SanchezEthanol_theta.png')
+        fname_zoom = os.path.join(directory, 'SanchezEthanol_theta_zoom.png')
         for lim in {True, False}:
-            for label, (color, data, idx) in species.items():
-                plt.plot(data[:, 0], data[:, 1], label=f'{label}, Sanchez Solution', linestyle='-', color=color)
-                plt.plot(self.operation.potential, self.melek.results.theta[:, idx], linestyle='--', color=color,
-                         label=fr'${label}, \mu$Elektrodica solution')
-                plt.plot(self.operation.potential, self.melek_cstr.results.theta[:, idx], linestyle=':', color=color)
+            for label, (colors, data, idx) in species.items():
+                plt.plot(data[:, 0], data[:, 1], linestyle='-', color=colors)
+                plt.plot(self.operation.potential, self.melek.results.theta[:, idx], linestyle='--', color=colors)
+                plt.plot(self.operation.potential, self.melek_cstr.results.theta[:, idx], linestyle=':', color=colors)
 
             plt.xlabel('Overpotential [V]')
             plt.ylabel(r'$\theta_i$')
@@ -619,7 +624,7 @@ class Ethanol:
             plt.tight_layout()
 
             species_legend = [
-                Line2D([0], [0], color=color, lw=2, label=fr'{specie}*') for specie, (color, _, _) in species.items()
+                Line2D([0], [0], color=colors, lw=2, label=fr'{specie}*') for specie, (colors, _, _) in species.items()
             ]
             solutions_legend = [
                 Line2D([0], [0], color='grey', lw=2, linestyle='-', label='Sanchez-Monreal et. al. 2017'),
@@ -631,10 +636,12 @@ class Ethanol:
             if lim:
                 plt.ylim(1e-3, 1.1)
                 plt.legend(handles=solutions_legend, loc='lower center')
-                #plt.savefig('SanchezEthanol_theta_zoom.png', dpi=300, bbox_inches='tight', format='png')
+                plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
+                plt.savefig(fname_zoom, dpi=300, bbox_inches='tight', format='png')
             else:
                 first_legend = plt.legend(handles=species_legend, loc='lower left')
                 plt.gca().add_artist(first_legend)
                 #plt.legend(handles=solutions_legend, loc='lower right')
-                #plt.savefig('SanchezEthanol_theta.png', dpi=300, bbox_inches='tight', format='png')
+                plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
+                plt.savefig(fname, dpi=300, bbox_inches='tight', format='png')
             plt.show()

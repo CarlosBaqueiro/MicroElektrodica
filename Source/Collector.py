@@ -50,14 +50,14 @@ class DataParameters:
             :type parameters_file: str
             """
         header, raw_data = Collector.raw_data(parameters_file)
-        self.parameters_list: list = raw_data[:, header.index('Parameters')]
-        self.variables_list: list = raw_data[:, header.index('Variables')]
-        values: list = raw_data[:, header.index('Value')]
-        units: list = raw_data[:, header.index('Units')]
+        self.parameters_list = raw_data[:, header.index('Parameters')]
+        self.variables_list = raw_data[:, header.index('Variables')]
+        values = raw_data[:, header.index('Value')]
+        units = raw_data[:, header.index('Units')]
 
         # Temperature
-        T: float = float(values[self.variables_list == 'Temperature'])
-        uT: str = units[self.variables_list == 'Temperature']
+        T = float(values[self.variables_list == 'Temperature'])
+        uT = units[self.variables_list == 'Temperature']
         self.T = unit_conversion('Temperature', T, uT, 'K')
 
         # Potential
@@ -71,6 +71,7 @@ class DataParameters:
         self.anode = initialize(values, self.variables_list, 'Anode')
         self.cstr = initialize(values, self.parameters_list, 'Continuous Stirred-Tank Reactor')
         self.tst = initialize(values, self.parameters_list, 'Transient state theory')
+        self.js = initialize(values, self.variables_list, 'j*')
         self.experimental = initialize(values, self.parameters_list, 'Experimental')
         self.chemical = initialize(values, self.parameters_list, 'Chemical')
         
@@ -82,11 +83,12 @@ class DataParameters:
 
         # Rate Constants
         # Pre-exponential
+        self.pre_exponential = float(values[self.variables_list == 'A'])
+        if self.js:
+            self.js_value = float(values[self.variables_list == 'j* (value)'])
         if self.tst:
             self.kappa = float(values[self.variables_list == 'kappa'])
             self.m = float(values[self.variables_list == 'm'])
-        else:
-            self.pre_exponential = float(values[self.variables_list == 'j* (or A)'])
 
         # Check Chemical part details
         if self.chemical:

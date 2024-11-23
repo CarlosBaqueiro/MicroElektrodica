@@ -4,8 +4,7 @@ from numpy import ndarray
 from .Constants import F, k_B, h
 from .Tools import showme
 
-
-# import sys
+import sys
 # sys.exit()
 
 class FreeEnergy:
@@ -263,10 +262,11 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         if not self.parameters.anode: self.electrode = - 1.0
 
         # Pre-exponential
+        self.pre_exp = self.parameters.pre_exponential
+        if self.parameters.js:
+            self.pre_exp = self.parameters.js_value / F
         if self.parameters.tst:
             self.pre_exp = self.parameters.kappa * k_B * self.parameters.T ** self.parameters.m / h
-        else:
-            self.pre_exp = self.parameters.pre_exponential
 
         # Experimental
         self.eK = np.ones((2, len(self.reactions.list)))
