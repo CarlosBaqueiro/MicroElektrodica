@@ -35,18 +35,18 @@ class DataParameters:
     :type potential: numpy.ndarray
     :ivar T: Temperature in Kelvin after unit conversion.
     :type T: float
-    :ivar anode: Initialized anode parameters.
-    :type anode: any
+    :ivar anode: Electrode, True for anode, False for cathode.
+    :type anode: bool
     :ivar cstr: Initialized Continuous Stirred-Tank Reactor (CSTR) parameters.
-    :type cstr: any
+    :type cstr: bool
     :ivar tst: Initialized Transient State Theory parameters.
-    :type tst: any
+    :type tst: bool
     :ivar js: Initialized j* parameters.
-    :type js: any
+    :type js: bool
     :ivar experimental: Initialized experimental parameters.
-    :type experimental: any
+    :type experimental: bool
     :ivar chemical: Initialized chemical parameters.
-    :type chemical: any
+    :type chemical: bool
     :ivar Fv: Volumetric flux value for CSTR, if applicable.
     :type Fv: float
     :ivar Ac: Catalyst active surface area for CSTR, if applicable.
@@ -60,9 +60,9 @@ class DataParameters:
     :ivar m: m value for transient state theory, if applicable.
     :type m: float
     :ivar DG_reaction: DG reaction parameter for chemical data, if applicable.
-    :type DG_reaction: any
+    :type DG_reaction: bool
     :ivar G_formation: G formation parameter for chemical data, if applicable.
-    :type G_formation: any
+    :type G_formation: bool
     """
 
     def __init__(self, parameters_file: str) -> None:
