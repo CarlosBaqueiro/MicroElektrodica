@@ -12,30 +12,47 @@ from .Tools import unit_conversion
 
 class DataParameters:
     """
-    A class used to manage and initialize simulation parameters for different chemical
-    and experimental scenarios. It processes the parameters and variables from the
-    input file, performs unit conversions, and initializes various system components
-    like anode, CSTR, and reaction parameters.
+    A class used to manage and initialize simulation parameters for different chemical and
+    experimental scenarios. It processes the parameters and variables from the input file,
+    performs unit conversions, and initializes various system components like anode, CSTR,
+    and reaction parameters.
 
-    :param parameters_file: The file containing the simulation parameters and variables.
-    :type parameters_file: str
-
-    :ivar parameters_list: List of parameter names extracted from the input file.
-    :ivar variables_list: List of variable names extracted from the input file.
-    :ivar T: Temperature in Kelvin, after unit conversion.
-    :ivar potential: Array of potential values generated from initial, final, and step potential.
-    :ivar anode: Initialization status of the anode component.
-    :ivar cstr: Initialization status of the Continuous Stirred-Tank Reactor component.
-    :ivar tst: Initialization status of the Transient State Theory component.
-    :ivar experimental: Initialization status of the experimental component.
-    :ivar chemical: Initialization status of the chemical component.
-    :ivar Fv: Volumetric flux, initialized if CSTR component is true.
-    :ivar Ac: Catalyst active surface area, initialized if CSTR component is true.
-    :ivar kappa: Pre-exponential rate constant kappa, initialized if TST component is true.
-    :ivar m: Pre-exponential rate constant m, initialized if TST component is true.
-    :ivar pre_exponential: Pre-exponential rate constant, initialized if TST component is false.
-    :ivar DG_reaction: Gibbs free energy of reaction, initialized if chemical component is true.
-    :ivar G_formation: Gibbs free energy of formation, initialized if chemical component is true.
+    :ivar parameters_list: A list containing the parameter names extracted from the file.
+    :type parameters_list: numpy.ndarray
+    :ivar variables_list: A list containing the variable names extracted from the file.
+    :type variables_list: numpy.ndarray
+    :ivar potential: A numpy array representing the range of potential values.
+    :type potential: numpy.ndarray
+    :ivar T: Temperature in Kelvin after unit conversion.
+    :type T: float
+    :ivar anode: Initialized anode parameters.
+    :type anode: any
+    :ivar cstr: Initialized Continuous Stirred-Tank Reactor (CSTR) parameters.
+    :type cstr: any
+    :ivar tst: Initialized Transient State Theory parameters.
+    :type tst: any
+    :ivar js: Initialized j* parameters.
+    :type js: any
+    :ivar experimental: Initialized experimental parameters.
+    :type experimental: any
+    :ivar chemical: Initialized chemical parameters.
+    :type chemical: any
+    :ivar Fv: Volumetric flux value for CSTR, if applicable.
+    :type Fv: float
+    :ivar Ac: Catalyst active surface area for CSTR, if applicable.
+    :type Ac: float
+    :ivar pre_exponential: Pre-exponential factor in rate constant calculation.
+    :type pre_exponential: float
+    :ivar js_value: Value of j*, if applicable.
+    :type js_value: float
+    :ivar kappa: Kappa value for transient state theory, if applicable.
+    :type kappa: float
+    :ivar m: m value for transient state theory, if applicable.
+    :type m: float
+    :ivar DG_reaction: DG reaction parameter for chemical data, if applicable.
+    :type DG_reaction: any
+    :ivar G_formation: G formation parameter for chemical data, if applicable.
+    :type G_formation: any
     """
 
     def __init__(self, parameters_file: str) -> None:
@@ -99,19 +116,16 @@ class DataParameters:
 
 def initialize(values: list, lista: list, name: str) -> bool:
     """
-    Initialize the system based on the provided values, list, and name. This function checks if the name is present in
-    the list and if the corresponding value in the list is 'True'. If both conditions are met, the function returns True.
-    Otherwise, it returns False.
+    Checks if a given name exists in a list and if the corresponding value in another
+    list is 'True'.
 
-    :param lista:
-    :param values: Dictionary with boolean-like values mapped to lists.
-    :type values: dict
-    :param list: List of names to be checked.
-    :type list: list
-    :param name: Name to be checked in the list.
-    :type name: str
-    :return: True if the name is in the list and the corresponding value is 'True', otherwise False.
-    :rtype: bool
+    :param values: List of values where each position corresponds to an element
+                   in 'lista'.
+    :param lista: List of names to be checked.
+    :param name: Name to be searched within 'lista'.
+
+    :return: Returns True if 'name' is found in 'lista' and the corresponding value
+             in 'values' is 'True'. Otherwise, returns False.
     """
     if name in lista and values[lista == name] == 'True':
         return True
@@ -120,32 +134,36 @@ def initialize(values: list, lista: list, name: str) -> bool:
 
 class DataSpecies:
     """
-    Handles species data, including reactants, products, adsorbed species, and catalysts,
-    as well as their initial concentrations and formation Gibbs energies. It utilizes raw
-    data to categorize species and compile comprehensive lists and matrices useful for
-    further chemical computations and simulations.
+    Represents data related to chemical species, including reactants,
+    products, adsorbed species, and catalysts.
+
+    Detailed description of the DataSpecies class that initializes and
+    processes information related to various chemical species from a given
+    data file. It categorizes species based on their roles (such as reactants,
+    products, adsorbed, and catalysts) and computes relevant properties,
+    including formation energies and initial concentrations.
 
     :ivar reactants: List of reactant species.
-    :type reactants: list
-    :ivar products:  list of product species.
-    :type products: list
-    :ivar adsorbed: list of adsorbed species.
-    :type adsorbed: list
-    :ivar catalyst: list  of catalyst species.
-    :type catalyst: list
+    :type reactants: list of str
+    :ivar products: List of product species.
+    :type products: list of str
+    :ivar adsorbed: List of adsorbed species.
+    :type adsorbed: list of str
+    :ivar catalyst: List of catalyst species.
+    :type catalyst: list of str
     :ivar c0_reactants: Initial concentrations of reactant species.
     :type c0_reactants: numpy.ndarray
     :ivar c0_products: Initial concentrations of product species.
     :type c0_products: numpy.ndarray
-    :ivar list: Comprehensive list of all species including an electron.
-    :type list: list
-    :ivar nu_catalyst: Matrix indicating which adsorbed species are in which catalyst.
+    :ivar list: Combined list of all species including an electron placeholder.
+    :type list: list of str
+    :ivar nu_catalyst: Matrix indicating presence of adsorbed species in each catalyst.
     :type nu_catalyst: numpy.ndarray
-    :ivar G_formation_rct: Formation Gibbs energies of reactant species.
+    :ivar G_formation_rct: Gibbs free energy of formation for reactants.
     :type G_formation_rct: numpy.ndarray
-    :ivar G_formation_ads: Formation Gibbs energies of adsorbed species.
+    :ivar G_formation_ads: Gibbs free energy of formation for adsorbed species.
     :type G_formation_ads: numpy.ndarray
-    :ivar G_formation_prd: Formation Gibbs energies of product species.
+    :ivar G_formation_prd: Gibbs free energy of formation for products.
     :type G_formation_prd: numpy.ndarray
     """
     def __init__(self,species_file, parameters):
@@ -176,33 +194,34 @@ class DataSpecies:
 
 class DataReactions:
     """
-    This class deals with biochemical reactions data processing.
+    Manages and processes reaction data.
 
-    Detailed processing for reactions, including splitting into reactants and products,
-    calculating stoichiometric coefficients, and differentiating between various reaction
-    parameters based on provided configurations.
+    This class reads reaction data from a file, processes it to extract various
+    parameters and coefficients, and makes the data accessible for further
+    analysis. It also handles different experimental and chemical conditions
+    based on the provided parameters.
 
-    :ivar list: List of reaction ids.
+    :ivar list: List of reaction IDs.
     :type list: list
-    :ivar beta: Beta coefficients for reactions.
+    :ivar beta: Array of Beta parameters for the reactions.
     :type beta: numpy.ndarray
-    :ivar nu: Stoichiometric coefficients matrix.
+    :ivar nu: Stoichiometric matrix for the reactions.
     :type nu: numpy.ndarray
-    :ivar ne: Number of electrons transferred in reactions.
+    :ivar ne: Array of the number of electrons transferred in the reactions.
     :type ne: numpy.ndarray
-    :ivar nuc: Stoichiometric coefficients excluding catalysts.
+    :ivar nuc: Stoichiometric matrix without catalysts.
     :type nuc: numpy.ndarray
-    :ivar nua: Coefficients specific to adsorbates.
+    :ivar nua: Stoichiometric matrix for adsorbates.
     :type nua: numpy.ndarray
-    :ivar nux: Coefficients based on whether CSTR or not.
+    :ivar nux: Stoichiometric matrix adjusted for CSTR or experimental conditions.
     :type nux: numpy.ndarray
-    :ivar k_f: Forward rate constants (if experimental).
+    :ivar k_f: Array of forward reaction rate constants (optional).
     :type k_f: numpy.ndarray
-    :ivar k_b: Backward rate constants (if experimental).
+    :ivar k_b: Array of backward reaction rate constants (optional).
     :type k_b: numpy.ndarray
-    :ivar Ga: Gibbs free energy changes (if chemical).
+    :ivar Ga: Array of Gibbs free energy changes (optional).
     :type Ga: numpy.ndarray
-    :ivar DG_reaction: Change in free energy for reaction (if provided).
+    :ivar DG_reaction: Array of Delta G reaction values (optional).
     :type DG_reaction: numpy.ndarray
     """
     def __init__(self, reaction_file, parameters, species):
@@ -269,16 +288,16 @@ class DataReactions:
 
 class Collector:
     """
-    Handles the collection and processing of data from a specified directory.
+    Manages and processes data related to parameters, species, and reactions from specified directory.
 
-    The class initializes with the directory path and reads parameters, species,
-    and reactions data from associated files.
+    This class is designed to handle and manage data from files located in a given directory.
+    It initializes various data parameters, species, and reactions by reading from corresponding files.
 
-    :ivar parameters: Contains parameters data read from 'parameters.md'.
+    :ivar parameters: Instance handling data parameters from the parameters.md file.
     :type parameters: DataParameters
-    :ivar species: Contains species data read from 'species.md'.
+    :ivar species: Instance managing species information from the species.md file.
     :type species: DataSpecies
-    :ivar reactions: Contains reactions data read from 'reactions.md'.
+    :ivar reactions: Instance managing reaction data from the reactions.md file.
     :type reactions: DataReactions
     """
     def __init__(self, directory):
