@@ -14,7 +14,7 @@ begin()
 
 pakage = 'Wang2007Hydrogen'
 
-run = False
+run = True
 validation = False
 
 if __name__ == '__main__':
@@ -26,8 +26,7 @@ if __name__ == '__main__':
         else:
             print(f"Directory: {directory}")
             data = Collector(directory)
-            results = Calculator(data)
-            Grapher(data, results)
+            Grapher(data, Calculator(data))
     if validation:
         Validation()
 

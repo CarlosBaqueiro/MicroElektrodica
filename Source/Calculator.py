@@ -356,5 +356,3 @@ class Calculator:
             self.strategy = StaticConcentration(self.data, self.Kpy)
 
         self.results = self.strategy.solver()
-
-

@@ -36,8 +36,9 @@ class Grapher:
         self.operation = data.parameters
         self.species = data.species
         self.reactions = data.reactions
+        self.results = results.results
 
-        self.graph_results(self.operation, self.species, results)
+        self.graph_results(self.operation, self.species, self.results)
 
     def graph_results(self, operation, species, results):
         self.plot_fval(operation, species, results)
@@ -61,7 +62,7 @@ class Grapher:
          elif label == 'all':
             c_species = np.concatenate([results.c_reactants, results.c_products, results.theta], axis=1)
             legends = species.reactants + species.products + species.adsorbed
-            plt.ylabel(r'$\frac{\partial \c_i}{\partial t}\ and\ \frac{\partial \theta_i}{\partial t}$')
+            plt.ylabel(r'$c_i\ and\ \theta_i$')
          return self.plot(operation, c_species, legends, login=login)
 
 
