@@ -1,13 +1,22 @@
 """
-     μElektrodica:
-                     Calculator class
-     @Author : Carlos Baqueiro Basto
+
+    μElektrodica (Uxmal, version 1.0.0)
+        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
+        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        All rights reserved.
+
+        Calculator class
 
 """
 
 import numpy as np
 from scipy.optimize import fsolve
 from .Kpynetic import Kpynetic
+
+# for debugging
+#import sys
+# sys.exit()
+#from .Tools import showme
 
 class BaseConcentration:
     """

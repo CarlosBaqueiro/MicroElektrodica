@@ -21,4 +21,7 @@ def print_center(text):
 def begin ( ):
     print(f'\n')
     print_center('\u03BCElektrodica')
-    print(f'\n')
+    print_center('Uxmal 1.0.0\n')
+    print(f'A Python Tool for Modeling Microkinetic Electrocatalytic Reactions\n'
+          f'Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez\n'
+          f'All rights reserved.\n')

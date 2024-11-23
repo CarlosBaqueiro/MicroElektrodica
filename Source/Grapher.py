@@ -1,15 +1,21 @@
 """
-M-elektrodica:
-                Graphics functions
-@author : Carlos Baqueiro Basto
 
-Created on Julio 2024
+    μElektrodica (Uxmal, version 1.0.0)
+        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
+        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        All rights reserved.
+
+        Grapher class
+
 """
-
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+# for debugging
+#import sys
+# sys.exit()
+#from .Tools import showme
 
 class Grapher:
     def __init__(self, data, results):

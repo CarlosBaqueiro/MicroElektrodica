@@ -1,17 +1,26 @@
+"""
+
+    μElektrodica (Uxmal, version 1.0.0)
+        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
+        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        All rights reserved.
+
+        Validation class
+
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-import sys
-#sys.exit()
 
-
-from .Kpynetic import *
 from .Collector import *
 from .Calculator import *
-from .Constants import k_B
-from .Tools import showme
 
+# for debugging
+#from .Tools import showme
+#import sys
+# sys.exit()
 
 class Validation:
     def __init__(self):

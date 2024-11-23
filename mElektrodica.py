@@ -1,22 +1,24 @@
 """
-μElektrodica:
-                Simulator
-@author : Carlos Baqueiro Basto
 
-Created on Julio 2024
+    μElektrodica (Uxmal, version 1.0.0)
+        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
+        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        All rights reserved.
+
 """
+
 
 import os
 from Source import *
 begin()
 
 pakage = 'Wang2007Hydrogen'
-#pakage = 'SanchezMonreal2017Ethanol'
-#pakage =  'Moore2013Oxygen'
+
+run = False
+validation = False
+
 if __name__ == '__main__':
-    Validation()
-    run = False
-    test = False
+
     if run:
         directory = os.path.join('Examples', pakage)
         if not os.path.exists(directory):
@@ -26,6 +28,7 @@ if __name__ == '__main__':
             data = Collector(directory)
             results = Calculator(data)
             Grapher(data, results)
-
+    if validation:
+        Validation()
 
 

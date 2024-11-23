@@ -1,5 +1,21 @@
+"""
+
+    μElektrodica (Uxmal, version 1.0.0)
+        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
+        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        All rights reserved.
+
+        Tester class
+
+"""
+
 import numpy as np
 from .Grapher import Grapher
+
+# for debugging
+#import sys
+# sys.exit()
+#from .Tools import showme
 
 class Tester:
     def __init__(self, data, results):

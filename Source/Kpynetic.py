@@ -1,10 +1,22 @@
+"""
+
+    μElektrodica (Uxmal, version 1.0.0)
+        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
+        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        All rights reserved.
+
+        Kpynetic class
+
+"""
+
 import numpy as np
 from numpy import ndarray
 
 from .Constants import F, k_B, h
-from .Tools import showme
 
-import sys
+# for debugging
+#from .Tools import showme
+#import sys
 # sys.exit()
 
 class FreeEnergy:
