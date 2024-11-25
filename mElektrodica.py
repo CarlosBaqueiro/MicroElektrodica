@@ -1,9 +1,8 @@
 """
 
-    μElektrodica (Uxmal, version 1.0.0)
-        A Python Tool for Modeling Microkinetic Electrocatalytic Reactions
-        Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
-        All rights reserved.
+    μElektrodica © 2024
+        by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        is licensed under CC BY-NC-SA 4.0
 
 """
 

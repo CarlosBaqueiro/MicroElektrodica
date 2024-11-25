@@ -1,3 +1,14 @@
+"""
+
+    μElektrodica © 2024
+        by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        is licensed under CC BY-NC-SA 4.0
+
+        Tools
+
+"""
+
+
 import shutil
 
 def unit_conversion(variable, value, unit_in, unit_out):
@@ -20,8 +31,8 @@ def print_center(text):
 
 def begin ( ):
     print(f'\n')
-    print_center('\u03BCElektrodica')
+    print_center('\u03BCElektrodica © 2024')
     print_center('Uxmal 1.0.0\n')
     print(f'A Python Tool for Modeling Microkinetic Electrocatalytic Reactions\n'
-          f'Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez\n'
-          f'All rights reserved.\n')
+          f'C. Baqueiro Basto, M. Secanell, L.C. Ordoñez\n'
+          f'licensed under CC BY-NC-SA 4.0 \n')
