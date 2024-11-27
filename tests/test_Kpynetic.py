@@ -1,3 +1,14 @@
+"""
+
+    μElektrodica © 2024
+        by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        is licensed under CC BY-NC-SA 4.0
+
+        Kpynetic, Unit test
+
+"""
+
+
 import unittest
 from Source import *
 
