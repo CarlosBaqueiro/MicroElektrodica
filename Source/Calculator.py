@@ -104,12 +104,10 @@ class BaseConcentration:
 
     def ride_hand_side(self, c_reactants, c_products, theta):
         """
-        Compute the rate of change of reactants and products in a chemical reaction.
+        Compute the right-hand side of the reaction rate equation.
 
-        This method calculates the right-hand side of a differential equation representing the
-        rate of change of concentration of reactants and products in a chemical reaction
-        system. The reaction can be characterized by specific parameters such as
-        stoichiometric coefficients and kinetic parameters.
+        This method calculates the right-hand side of the reaction rate equation given the
+        concentrations of reactants and products, and a set of parameters.
 
         :param c_reactants: Concentration of reactants.
         :type c_reactants: float
@@ -133,7 +131,7 @@ class BaseConcentration:
         product concentrations, and an additional parameter theta. It then
         computes the right-hand side (rhs) of the equations using these
         concentrations. The potential function is updated with the
-        concentrations and potential. Finally, it calculates the rate of
+        concentrations and potential. Finally, it calculates the rate
         change of concentrations and returns the difference between this
         rate and the rhs value.
 
@@ -144,7 +142,7 @@ class BaseConcentration:
         :param potential: A potential value affecting the concentration
                           changes.
         :type potential: float
-        :return: Difference between the rate of change of concentrations
+        :return: Difference between the rate change of concentrations
                  and the rhs value.
         :rtype: float
         """
@@ -180,7 +178,7 @@ class StaticConcentration(BaseConcentration):
     This class initializes the concentrations of species within a reactive
     system and handles variables associated with the reaction process.
     It provides methods to initialize the system, unpack variables used in
-    the reaction, and calculate the rate of change of the system.
+    the reaction, and calculate the rate change of the system.
 
     :ivar species: Contains the species involved in the reaction.
     :type species: Species
@@ -288,6 +286,7 @@ class DynamicConcentration(BaseConcentration):
 
         """
             Compute the right-hand side of the equation for the given reactant, product concentrations, and parameter theta.
+
             This function takes the concentrations of reactants and products and computes the right-hand side of the equation.
             It returns a concatenated numpy array containing the computed values for the reactants, products, and a zero-filled
             array of the same length as the theta parameter. This is typically used for simulations or mathematical modeling
