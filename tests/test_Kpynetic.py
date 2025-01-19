@@ -8,9 +8,9 @@
 
 """
 
-
 import unittest
-from Source import *
+from melektrodica import *
+
 
 class TestFreeEnergy(unittest.TestCase):
     """
@@ -39,6 +39,7 @@ class TestFreeEnergy(unittest.TestCase):
     test_reaction_mismatched_lengths():
         Tests the reaction method with arrays of mismatched lengths.
     """
+
     def setUp(self):
         self.FreeEnergy = FreeEnergy()
 
@@ -69,6 +70,7 @@ class TestFreeEnergy(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.FreeEnergy.reaction(upsilon, G_formation)
 
+
 class TestRateConstants(unittest.TestCase):
     """
     Test cases for the RateConstants class, verifying the correctness of its methods.
@@ -78,6 +80,7 @@ class TestRateConstants(unittest.TestCase):
     the accuracy of the computations and ensures that the methods return the expected
     results under specific conditions.
     """
+
     def setUp(self):
         self.rate_constants = RateConstants()
 
@@ -92,9 +95,15 @@ class TestRateConstants(unittest.TestCase):
         experimental = 2
         chemical = 10
         electrical = 5
-        expected_result = pre_exponential * experimental * np.exp(-(chemical + electrical) / (8.617333262145e-5) / 300)
+        expected_result = (
+            pre_exponential
+            * experimental
+            * np.exp(-(chemical + electrical) / (8.617333262145e-5) / 300)
+        )
 
-        result = self.rate_constants.constant(pre_exponential, experimental, chemical, electrical)
+        result = self.rate_constants.constant(
+            pre_exponential, experimental, chemical, electrical
+        )
         self.assertAlmostEqual(result, expected_result, places=6)
 
     def test_experimental(self):
@@ -120,6 +129,7 @@ class TestRateConstants(unittest.TestCase):
         result = RateConstants.electrical(eta, ne, beta)
         np.testing.assert_array_equal(result, expected_result)
 
+
 class TestReactionRate(unittest.TestCase):
     """
     Test suite for the ReactionRate class.
@@ -139,6 +149,7 @@ class TestReactionRate(unittest.TestCase):
         test_powerlaw_negative_upsilon: Tests the powerlaw method when upsilon is
             negative to ensure the results meet expected conditions.
     """
+
     def setUp(self):
         self.reaction_rate = ReactionRate()
 
@@ -157,7 +168,9 @@ class TestReactionRate(unittest.TestCase):
         c_products = np.array([0.5, 0.5])
         theta = np.array([0.1])
         result = self.reaction_rate.concentrate(c_reactants, c_products, theta)
-        self.assertEqual(result.shape[0], c_reactants.size + c_products.size + theta.size + 2)
+        self.assertEqual(
+            result.shape[0], c_reactants.size + c_products.size + theta.size + 2
+        )
 
     def test_powerlaw_positive_upsilon(self):
         concentrations = np.array([[1.0, 2.0], [2.0, 3.0]])
@@ -179,6 +192,7 @@ class TestKpynetic(unittest.TestCase):
     This class contains unit tests that verify the correct initialization and behavior of the
     Kpynetic module, ensuring that attributes and methods function as expected.
     """
+
     class Parameters:
         anode = False
         pre_exponential = 1.0
@@ -217,8 +231,13 @@ class TestKpynetic(unittest.TestCase):
     def test_initialization(self):
         self.assertEqual(self.kpynetic.electrode, -1.0)
         self.assertEqual(self.kpynetic.pre_exp, 1.0)
-        np.testing.assert_array_equal(self.kpynetic.eK, np.ones((2, len(self.data.reactions.list))))
-        np.testing.assert_array_equal(self.kpynetic.qK, np.zeros((2, len(self.data.reactions.list))))
+        np.testing.assert_array_equal(
+            self.kpynetic.eK, np.ones((2, len(self.data.reactions.list)))
+        )
+        np.testing.assert_array_equal(
+            self.kpynetic.qK, np.zeros((2, len(self.data.reactions.list)))
+        )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

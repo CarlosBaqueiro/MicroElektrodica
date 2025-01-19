@@ -3,7 +3,7 @@
 | Electrode                       | Anode                        | False |       |
 | Physics parameters              | Temperature                  |    80 |   C   |
 |                                 | Initial potential            |   0.1 |   V   |
-|                                 | Final potential              |   0.9 |   V   |
+|                                 | Final potential              |     1 |   V   |
 |                                 | Step potential               | 0.001 |   V   |
 | Continuous Stirred-Tank Reactor | Concentration = f(potential) | False |       |
 |                                 | Catalyst Active surface area |   1.0 |  cm2  |

@@ -7,16 +7,19 @@
         Kpynetic class
 
 """
-
+import copy
 import numpy as np
 from numpy import ndarray
 
-from .Constants import F, k_B, h
+from .writer import Writer
+from .constants import F, k_B, h
+
 
 # for debugging
-#from .Tools import showme
-#import sys
+# from .Tools import showme
+# import sys
 # sys.exit()
+
 
 class FreeEnergy:
     """
@@ -27,11 +30,11 @@ class FreeEnergy:
 
     """
 
-    def __init__(self):
+    def __init__(self, data):
         pass
 
     @staticmethod
-    def reaction(upsilon: ndarray, G_formation: ndarray) -> ndarray:
+    def reaction(upsilon: ndarray, g_formation: ndarray) -> ndarray:
         """
         Calculate the Gibbs free energy change for a reaction.
 
@@ -44,14 +47,15 @@ class FreeEnergy:
                         participating in the reaction.
         :type upsilon: numpy.ndarray
 
-        :param G_formation: A vector of Gibbs free energies of formation
+        :param g_formation: A vector of Gibbs free energies of formation
                             for each substance involved in the reaction.
-        :type G_formation: numpy.ndarray
+        :type g_formation: numpy.ndarray
 
         :return: The Gibbs free energy change for the reaction.
         :rtype: float
         """
-        return -(upsilon @ G_formation)
+        #print(f'Kpynetic.FreeEnergy.reaction: \n upsilon = {upsilon}, g_formation = {g_formation}')
+        return -(upsilon @ g_formation)
 
 
 class RateConstants:
@@ -59,28 +63,34 @@ class RateConstants:
     A class used to calculate various rate constants for a chemical reaction system.
 
     This class provides methods to compute general rate constants, experimental rate constants,
-    chemical reaction factors, and electrical parameters.
+    chemical reaction factors, and electronic parameters.
 
     :ivar parameters: Parameters object containing temperature and other relevant properties.
     :type parameters: object
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, data):
+        self.data = data
+        self.parameters = data.parameters
+        self.reactions = data.reactions
 
-    def constant(self, pre_exponential=1, experimental=1, chemical=0, electrical=0):
+    def constant(self, pre_exponential=1, experimental=1, chemical=0, electronic=0):
         """
         Example class for demonstrating the calculation of a kinetics constant based on
         provided parameters.
         :param pre_exponential: Preexponential factor.
         :param experimental: Experimental rate constant.
         :param chemical: Chemical part of the rate constant.
-        :param electrical: Electrical part of the rate constant.
+        :param electronic: electronic part of the rate constant.
         :param parameters: Object with temperature attribute
         :type parameters: Object
         """
-        argument = (chemical + electrical)
-        return pre_exponential * experimental * np.exp(-argument / k_B / self.data.parameters.T)
+        self.argument = chemical + electronic
+        return (
+                pre_exponential
+                * experimental
+                * np.exp(-self.argument / k_B / self.data.parameters.temperature)
+        )
 
     @staticmethod
     def experimental(forward_constants, backward_constants):
@@ -102,7 +112,7 @@ class RateConstants:
         return np.array([forward_constants, backward_constants])
 
     @staticmethod
-    def chemical(G_activation, DG_reaction, ne):
+    def thermodynamic(g_activation, g_formation, upsilon):
         """
         Compute the chemical energy.
 
@@ -110,21 +120,21 @@ class RateConstants:
         energy, change in the Gibbs free energy of the reaction, and the
         number of electrons involved.
 
-        :param G_activation: Activation energy.
-        :param DG_reaction: Change in Gibbs free energy of the reaction.
-        :param ne: Number of electrons involved.
+        :param g_activation: Activation energy.
+        :param dg_reaction: Change in Gibbs free energy of the reaction.
         :return: Array containing the activation energy and the total chemical
                  energy (activation energy plus change in Gibbs free energy).
         """
-        return np.array([G_activation, G_activation + DG_reaction])
+        dg_reaction = FreeEnergy.reaction(upsilon, g_formation)
+        return np.array([g_activation, g_activation + dg_reaction])
 
     @staticmethod
-    def electrical(eta, ne, beta):
+    def electronic(eta, ne, beta):
         """
-        Calculates the electrical field components based on the specified parameters.
+        Calculates the electronic field components based on the specified parameters.
 
         The function utilizes the given eta, ne, and beta values to compute an array
-        that represents the electrical field. The resulting array contains two elements:
+        that represents the electronic field. The resulting array contains two elements:
         the first being the product of -ne, beta, and eta, and the second being the product
         of ne, (1 - beta), and eta.
 
@@ -134,7 +144,7 @@ class RateConstants:
         :type ne: float
         :param beta: The proportionality constant.
         :type beta: float
-        :return: An array representing the electrical field components.
+        :return: An array representing the electronic field components.
         :rtype: numpy.ndarray
         """
         return np.array([-ne * beta * eta, ne * (1 - beta) * eta])
@@ -154,8 +164,9 @@ class ReactionRate:
     :type nu_catalyst: np.ndarray
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, data):
+        self.data = data
+        self.species = data.species
 
     def rate(self, k_rate, c_reactants, c_products, theta, upsilon):
         """
@@ -174,10 +185,10 @@ class ReactionRate:
         :return: The calculated reaction rate.
         """
         concentrations = self.concentrate(c_reactants, c_products, theta)
-        rate = self.powerlaw(concentrations, upsilon)
+        rate = self.power_law(concentrations, upsilon)
         return np.sum(k_rate * rate, axis=0)
 
-    def emptysites(self, theta):
+    def empty_sites(self, theta):
         """
         Calculate and return the empty sites in the catalyst.
 
@@ -196,7 +207,7 @@ class ReactionRate:
     def concentrate(self, c_reactants, c_products, theta):
         """
         This method concatenates the concentrations of reactants, products, the given theta value,
-        and the result of `self.emptysites()` method into a single numpy array.
+        and the result of `self.empty_sites()` method into a single numpy array.
 
         :param c_reactants: Concentration vector for reactants.
         :type c_reactants: np.ndarray
@@ -208,9 +219,9 @@ class ReactionRate:
                  the `self.emptysites()` method.
         :rtype: np.ndarray
         """
-        return np.concatenate([c_reactants, c_products, theta, self.emptysites(theta)])
+        return np.concatenate([c_reactants, c_products, theta, self.empty_sites(theta)])
 
-    def powerlaw(self, concentration: ndarray, upsilon: ndarray) -> ndarray:
+    def power_law(self, concentration: ndarray, upsilon: ndarray) -> ndarray:
         """
         Computes the power law of given concentrations with a specified upsilon value.
 
@@ -226,8 +237,12 @@ class ReactionRate:
         :return: Array containing the computed power law values
         :rtype: np.ndarray
         """
-        return np.array([np.prod(concentration ** (-upsilon * (upsilon < 0)), axis=1),
-                         -np.prod(concentration ** (upsilon * (upsilon > 0)), axis=1)])
+        return np.array(
+            [
+                np.prod(concentration ** (-upsilon * (upsilon < 0)), axis=1),
+                -np.prod(concentration ** (upsilon * (upsilon > 0)), axis=1),
+            ]
+        )
 
 
 class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
@@ -264,47 +279,80 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
     """
 
     def __init__(self, data):
+        self.writer = Writer()
+        self.writer.message(f"*** Kpynetic :  ***")
+        self.data = copy.deepcopy(data)
+        super().__init__(self.data)
+        self.k_rate = None
+        self.electronic_part = None
         self.data = data
         self.parameters = data.parameters
         self.species = data.species
         self.reactions = data.reactions
 
         self.electrode = 1.0
-        if not self.parameters.anode: self.electrode = - 1.0
+        if not self.parameters.anode:
+            self.electrode = -1.0
 
         # Pre-exponential
         self.pre_exp = self.parameters.pre_exponential
         if self.parameters.js:
             self.pre_exp = self.parameters.js_value / F
         if self.parameters.tst:
-            self.pre_exp = self.parameters.kappa * k_B * self.parameters.T ** self.parameters.m / h
+            self.pre_exp = (
+                    self.parameters.kappa
+                    * k_B
+                    * self.parameters.temperature ** self.parameters.m
+                    / h
+            )
 
         # Experimental
-        self.eK = np.ones((2, len(self.reactions.list)))
+        self.experimental_part = np.ones((2, len(self.reactions.list)))
         if self.parameters.experimental:
-            self.eK = RateConstants.experimental(self.reactions.k_f, self.reactions.k_b)
+            self.experimental_part = RateConstants.experimental(
+                self.reactions.k_f, self.reactions.k_b
+            )
 
-        # Chemical
-        self.qK = np.zeros((2, len(self.reactions.list)))
+        # Thermodynamic
+        self.thermodynamic_part = np.zeros((2, len(self.reactions.list)))
         if self.parameters.chemical:
-            self.Ga = self.reactions.Ga
-            if self.parameters.DG_reaction:
-                self.DG_reaction = self.reactions.DG_reaction
-            elif self.parameters.G_formation:
-                self.G_formation = self.species.G_formation_ads
-                self.DG_reaction = FreeEnergy.reaction(self.reactions.nua, self.G_formation)
-            self.qK = RateConstants.chemical(self.Ga, self.DG_reaction, self.reactions.ne)
+            self.g_activation = self.reactions.ga
+            self.g_formation = self.species.g_formation_ads
+            self.dg_reaction = FreeEnergy.reaction(self.reactions.nua, self.g_formation)
+            self.thermodynamic_part = RateConstants.thermodynamic(
+                self.g_activation, self.g_formation, self.reactions.nua
+            )
+            #if self.parameters.dg_reaction:
+            #    self.dg_reaction = self.reactions.dg_reaction
+            #elif self.parameters.g_formation:
 
-    def potential_function(self, potential, c_reactants, c_products, theta):
+    def foverpotential(self, potential, c_reactants, c_products, theta):
         eta = potential
-        self.potentialK = self.electrode * RateConstants.electrical(eta, self.reactions.ne, self.reactions.beta)
-        self.k_rate = self.constant(pre_exponential=self.pre_exp,
-                                    experimental=self.eK, chemical=self.qK,
-                                    electrical=self.potentialK)
-        self.v = self.rate(self.k_rate, c_reactants, c_products, theta, self.reactions.nu)
+        self.electronic_part = self.electrode * RateConstants.electronic(
+            eta, self.reactions.ne, self.reactions.beta
+        )
+        self.k_rate = self.constant(
+            pre_exponential=self.pre_exp,
+            experimental=self.experimental_part,
+            chemical=self.thermodynamic_part,
+            electronic=self.electronic_part,
+        )
+        self.v = self.rate(
+            self.k_rate, c_reactants, c_products, theta, self.reactions.nu
+        )
+
+    def get_argument(self, potential):
+        self.electronic_part = self.electrode * RateConstants.electronic(
+            potential, self.reactions.ne, self.reactions.beta
+        )
+        self.constant(pre_exponential=1, experimental=1,
+                      chemical=self.thermodynamic_part,
+                      electronic=self.electronic_part,
+                      )
+        return self.argument
 
     def current(self, potential, c_reactants, c_products, theta):
-        self.potential_function(potential, c_reactants, c_products, theta)
+        self.foverpotential(potential, c_reactants, c_products, theta)
         return np.dot(self.reactions.ne, self.v) * F
 
     def dcdt(self, rate, upsilon: np.ndarray) -> np.ndarray:
