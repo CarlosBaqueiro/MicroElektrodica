@@ -405,8 +405,6 @@ class Calculator:
         self.writer = Writer()
         self.writer.message(f"*** Calculator : {self.name}  ***")
 
-        self.Kpy = kpy
-        self.data = self.Kpy.data
         self.operation = self.data.parameters
         self.potential = self.operation.potential
         self.species = self.data.species
@@ -421,5 +419,3 @@ class Calculator:
         self.results = self.strategy.solver()
         if np.any(self.results.theta < 0):
             self.writer.logger.error("Solution contains negative values")
-
-

@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 
     μElektrodica © 2024
@@ -29,7 +31,7 @@ def adjust_curves(directory, file):
 
 
 if __name__ == "__main__":
-        # Create the parser for command-line arguments
+    # Create the parser for command-line arguments
     parser = argparse.ArgumentParser(description="Script to perform calculations and curve fitting.")
 
     # Positional argument: directory
