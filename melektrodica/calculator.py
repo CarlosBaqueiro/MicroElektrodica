@@ -360,43 +360,71 @@ class DynamicConcentration(BaseConcentration):
 
 class Calculator:
     """
-    A class used to perform calculations based on provided data and chosen strategy.
+    Represents a computational tool for executing operations, simulations, and
+    evaluations within a specified system.
 
-    This class initializes with given data and selects a strategy for concentration
-    calculation based on whether 'cstr' is set in the operation parameters. It then
-    performs the calculations and stores the results.
+    Provides mechanisms for handling system data, operational parameters,
+    and computational strategies, alongside logging features for tracking
+    execution and results. Assigns specific calculation strategies dynamically
+    based on the characteristics of the operational configuration.
 
-    :ivar data: The initial data provided for calculations.
-    :type data: dict
-    :ivar operation: The operational parameters derived from the initial data.
-    :type operation: dict
-    :ivar Kpy: An instance of the Kpynetic class used for kinetic calculations.
-    :type Kpy: Kpynetic
-    :ivar strategy: The concentration calculation strategy chosen based on
-        operational parameters.
-    :type strategy: DynamicConcentration or StaticConcentration
-    :ivar results: The results obtained from applying the chosen strategy's solver.
-    :type results: dict
+    Attributes:
+        name: str
+            The name assigned to the calculator instance. If not provided, defaults to 'melek'.
+        writer: Writer
+            An instance of the Writer class used for logging and messaging.
+        Kpy: <type>
+            A deep copy of the input kpy object used for operations and computations.
+        data: <type>
+            Holds the data contained within the Kpy object, representing input information for the calculations.
+        operation: <type>
+            References the `parameters` attribute of the data object and represents operational parameters.
+        potential: <type>
+            References the `potential` attribute within the operational parameters.
+        species: <type>
+            Represents all species involved in the system, extracted from the data object.
+        reactions: <type>
+            Represents all reactions within the system, extracted from the data object.
+        strategy: DynamicConcentration or StaticConcentration
+            Chooses between dynamic or static concentration strategies based on the cstr attribute in operation.
+        results: <type>
+            Stores the output of the solver executed from the selected strategy.
+
+    Raises:
+        ValueError
+            Raised if the results from the strategy solver contain negative values in `theta`.
     """
 
     def __init__(self, kpy, name=None):
         """
-        This class initializes with data and sets up a strategy for solving based
-        on the given data parameters. It dynamically selects between dynamic and
-        static concentration strategies, solving and storing the results.
+        Initializes the Calculator class and sets up default attributes and related objects required for computational processes.
 
-        :param data: Input data containing parameters required for initialization.
-        :type data: DataType
+        Attributes:
+            name: str
+                The name assigned to the calculator instance. If not provided, defaults to 'melek'.
+            writer: Writer
+                An instance of the Writer class used for logging and messaging.
+            Kpy: <type>
+                A deep copy of the input kpy object used for operations and computations.
+            data: <type>
+                Holds the data contained within the Kpy object, representing input information for the calculations.
+            operation: <type>
+                References the `parameters` attribute of the data object and represents operational parameters.
+            potential: <type>
+                References the `potential` attribute within the operational parameters.
+            species: <type>
+                Represents all species involved in the system, extracted from the data object.
+            reactions: <type>
+                Represents all reactions within the system, extracted from the data object.
+            strategy: DynamicConcentration or StaticConcentration
+                Chooses between dynamic or static concentration strategies based on the cstr attribute in operation.
+            results: <type>
+                Stores the output of the solver executed from the selected strategy.
 
-        :ivar data: Stores the input data.
-        :ivar operation: Extracted parameters from the input data.
-        :ivar Kpy: Instance of Kpynetic class initialized with data.
-        :ivar strategy: Selected strategy based on the presence of cstr in data
-                        parameters. Either DynamicConcentration or
-                        StaticConcentration.
-        :ivar results: Results obtained after solving using the selected strategy.
+        Raises:
+            ValueError
+                Raised if the results from the strategy solver contain negative values in `theta`.
         """
-
         if name is None:
             self.name = 'melek'
         else:
@@ -405,6 +433,8 @@ class Calculator:
         self.writer = Writer()
         self.writer.message(f"*** Calculator : {self.name}  ***")
 
+        self.Kpy = copy.deepcopy(kpy)
+        self.data = self.Kpy.data
         self.operation = self.data.parameters
         self.potential = self.operation.potential
         self.species = self.data.species
