@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 
     μElektrodica © 2024
@@ -7,15 +9,20 @@
         Calculator class
 
 """
-
+import copy
+import warnings
 import numpy as np
 from scipy.optimize import fsolve
-from .Kpynetic import Kpynetic
+
+from .kpynetic import Kpynetic
+from .writer import Writer
+
 
 # for debugging
-#import sys
+# import sys
 # sys.exit()
-#from .Tools import showme
+# from .Tools import showme
+
 
 class BaseConcentration:
     """
@@ -36,20 +43,20 @@ class BaseConcentration:
     :ivar j: Array for current density calculations.
     :ivar fval: Array for function values from steady-state equations.
     """
-    def __init__(self, data, Kpy):
 
-        self.data = data
-        self.operation = data.parameters
-        self.species = data.species
-        self.reactions = data.reactions
-        self.Kpy = Kpy
+    def __init__(self, kpy):
+        self.Kpy = kpy
+        self.data = self.Kpy.data
+        self.operation = self.data.parameters
+        self.potential = self.operation.potential
+        self.species = self.data.species
+        self.reactions = self.data.reactions
+
         self.c_reactants = None
         self.c_products = None
         self.theta = None
         self.j = None
         self.fval = None
-
-
 
     def solver(self):
         """
@@ -62,19 +69,36 @@ class BaseConcentration:
         :return: Updated instance of the caller object with calculated values.
         :rtype: self
         """
-        self.c_reactants = np.zeros((len(self.operation.potential), len(self.species.reactants)))
-        self.c_products = np.zeros((len(self.operation.potential), len(self.species.products)))
-        self.theta = np.zeros((len(self.operation.potential), len(self.species.adsorbed)))
-        self.j = np.zeros(len(self.operation.potential))
-        self.fval, initio = self.initialize()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
 
-        for i in range(len(self.operation.potential)):
-            potential = self.operation.potential[i]
-            solution = fsolve(self.steady_state, initio, args=potential, xtol=1e-12, maxfev=2000)
-            self.c_reactants[i], self.c_products[i], self.theta[i] = self.unzip_variables(solution)
+        self.c_reactants = np.zeros(
+            (len(self.operation.potential), len(self.species.reactants))
+        )
+        self.c_products = np.zeros(
+            (len(self.operation.potential), len(self.species.products))
+        )
+        self.theta = np.zeros(
+            (len(self.operation.potential), len(self.species.adsorbed))
+        )
+        self.j = np.zeros(len(self.potential))
+        self.fval, initio = self.initialize()
+        for i, potential in enumerate(self.operation.potential):
+            solution = fsolve(
+                self.steady_state, initio, args=potential, xtol=1e-12, maxfev=2000
+            )
+            self.c_reactants[i], self.c_products[i], self.theta[i] = (
+                self.unzip_variables(solution)
+            )
             self.fval[i] = self.steady_state(solution, potential)
             self.j[i] = self.current(solution, potential)
             initio = solution
+
+        for warning in w:
+            if issubclass(warning.category, RuntimeWarning):
+                self.Kpy.writer.logger.error(f"WARNING at potential {potential}: {warning.message}")
+                if "The iteration is not making good progress" in str(warning.message):
+                    raise RuntimeError(f"Convergence failed at potential {potential}")
         return self
 
     def initialize(self):
@@ -88,7 +112,9 @@ class BaseConcentration:
             on an instance of the BaseClass or any subclass that has not
             overridden this method.
         """
-        raise NotImplementedError("The method initialize must be implemented by the subclass")
+        raise NotImplementedError(
+            "The method initialize must be implemented by the subclass"
+        )
 
     def unzip_variables(self, variables):
         """
@@ -100,9 +126,11 @@ class BaseConcentration:
         :raises NotImplementedError: If the method is not implemented by the subclass.
         :return: None
         """
-        raise NotImplementedError("The method unzip_variables must be implemented by the subclass")
+        raise NotImplementedError(
+            "The method unzip_variables must be implemented by the subclass"
+        )
 
-    def ride_hand_side(self, c_reactants, c_products, theta):
+    def right_hand_side(self, c_reactants, c_products, theta):
         """
         Compute the right-hand side of the reaction rate equation.
 
@@ -120,7 +148,9 @@ class BaseConcentration:
         :return: Rate of change for reactants and products.
         :rtype: float
         """
-        raise NotImplementedError("The method unzip_variables must be implemented by the subclass")
+        raise NotImplementedError(
+            "The method unzip_variables must be implemented by the subclass"
+        )
 
     def steady_state(self, variables, potential):
         """
@@ -147,8 +177,8 @@ class BaseConcentration:
         :rtype: float
         """
         c_reactants, c_products, theta = self.unzip_variables(variables)
-        rhs = self.ride_hand_side(c_reactants, c_products, theta)
-        self.Kpy.potential_function(potential, c_reactants, c_products, theta)
+        rhs = self.right_hand_side(c_reactants, c_products, theta)
+        self.Kpy.foverpotential(potential, c_reactants, c_products, theta)
         return self.Kpy.dcdt(self.Kpy.v, self.reactions.nux) - rhs
 
     def current(self, variables, potential):
@@ -185,6 +215,7 @@ class StaticConcentration(BaseConcentration):
     :ivar operation: Holds operational parameters for the reaction.
     :type operation: Operation
     """
+
     def initialize(self):
         """
         Initializes the potential and adsorbed species arrays.
@@ -214,7 +245,7 @@ class StaticConcentration(BaseConcentration):
         theta = variables
         return c_reactants, c_products, theta
 
-    def ride_hand_side(self, c_reactants, c_products, theta):
+    def right_hand_side(self, c_reactants, c_products, theta):
         """
         Compute the right-hand side of the reaction rate equation.
 
@@ -232,6 +263,7 @@ class StaticConcentration(BaseConcentration):
         """
         return np.zeros(len(theta))
 
+
 class DynamicConcentration(BaseConcentration):
     """
     Handles dynamic concentration calculations for chemical species in a system.
@@ -247,6 +279,7 @@ class DynamicConcentration(BaseConcentration):
                    products, and adsorbed species.
     :type species: SpeciesParameters
     """
+
     def initialize(self):
         """
         Initializes the system by setting initial values for reactants, products, and adsorbed species.
@@ -258,8 +291,14 @@ class DynamicConcentration(BaseConcentration):
         :return: A tuple containing the initial condition vectors.
         :rtype: tuple(np.ndarray, np.ndarray)
         """
-        fval = np.zeros((len(self.operation.potential),
-                         len(self.species.reactants) + len(self.species.products) + len(self.species.adsorbed)))
+        fval = np.zeros(
+            (
+                len(self.operation.potential),
+                len(self.species.reactants)
+                + len(self.species.products)
+                + len(self.species.adsorbed),
+            )
+        )
         c_reactants0 = np.ones(len(self.species.reactants))
         c_products0 = np.zeros(len(self.species.products))
         theta0 = np.zeros(len(self.species.adsorbed))
@@ -277,35 +316,47 @@ class DynamicConcentration(BaseConcentration):
         :return: Tuple containing the concentrations of reactants, products, and adsorbed species.
         :rtype: tuple
         """
-        c_reactants = variables[:len(self.species.reactants)]
-        c_products = variables[len(self.species.reactants):-len(self.species.adsorbed)]
+        c_reactants = variables[: len(self.species.reactants)]
+        c_products = variables[
+                     len(self.species.reactants): -len(self.species.adsorbed)
+                     ]
         theta = variables[-len(self.species.adsorbed):]
         return c_reactants, c_products, theta
 
-    def ride_hand_side(self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray) -> np.ndarray:
-
+    def right_hand_side(
+            self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
+    ) -> np.ndarray:
         """
-            Compute the right-hand side of the equation for the given reactant, product concentrations, and parameter theta.
+        Compute the right-hand side of the equation for the given reactant, product concentrations, and parameter theta.
 
-            This function takes the concentrations of reactants and products and computes the right-hand side of the equation.
-            It returns a concatenated numpy array containing the computed values for the reactants, products, and a zero-filled
-            array of the same length as the theta parameter. This is typically used for simulations or mathematical modeling
-            involving chemical species and their concentrations.
+        This function takes the concentrations of reactants and products and computes the right-hand side of the equation.
+        It returns a concatenated numpy array containing the computed values for the reactants, products, and a zero-filled
+        array of the same length as the theta parameter. This is typically used for simulations or mathematical modeling
+        involving chemical species and their concentrations.
 
-            :param c_reactants: Concentrations of reactants.
-            :type c_reactants: np.ndarray
-            :param c_products: Concentrations of products.
-            :type c_products: np.ndarray
-            :param theta: Parameter array theta, often related to system parameters or conditions.
-            :type theta: np.ndarray
+        :param c_reactants: Concentrations of reactants.
+        :type c_reactants: np.ndarray
+        :param c_products: Concentrations of products.
+        :type c_products: np.ndarray
+        :param theta: Parameter array theta, often related to system parameters or conditions.
+        :type theta: np.ndarray
 
-            :return: A concatenated array containing the computed values for reactants, products, and a zero-filled array
-                     of the same length as theta.
-            :rtype: np.ndarray
-            """
-        return np.concatenate([(c_reactants - self.species.c0_reactants) * self.operation.Fv / self.operation.Ac,
-                               (c_products - self.species.c0_products) * self.operation.Fv / self.operation.Ac,
-                               np.zeros(len(theta))])
+        :return: A concatenated array containing the computed values for reactants, products, and a zero-filled array
+                 of the same length as theta.
+        :rtype: np.ndarray
+        """
+        return np.concatenate(
+            [
+                (c_reactants - self.species.c0_reactants)
+                * self.operation.Fv
+                / self.operation.Ac,
+                (c_products - self.species.c0_products)
+                * self.operation.Fv
+                / self.operation.Ac,
+                np.zeros(len(theta)),
+            ]
+        )
+
 
 class Calculator:
     """
@@ -327,7 +378,8 @@ class Calculator:
     :ivar results: The results obtained from applying the chosen strategy's solver.
     :type results: dict
     """
-    def __init__(self, data):
+
+    def __init__(self, kpy, name=None):
         """
         This class initializes with data and sets up a strategy for solving based
         on the given data parameters. It dynamically selects between dynamic and
@@ -344,13 +396,30 @@ class Calculator:
                         StaticConcentration.
         :ivar results: Results obtained after solving using the selected strategy.
         """
-        self.data = data
-        self.operation = data.parameters
 
-        self.Kpy = Kpynetic(self.data)
-        if self.operation.cstr:
-            self.strategy = DynamicConcentration(self.data, self.Kpy)
+        if name is None:
+            self.name = 'melek'
         else:
-            self.strategy = StaticConcentration(self.data, self.Kpy)
+            self.name = name
 
+        self.writer = Writer()
+        self.writer.message(f"*** Calculator : {self.name}  ***")
+
+        self.Kpy = kpy
+        self.data = self.Kpy.data
+        self.operation = self.data.parameters
+        self.potential = self.operation.potential
+        self.species = self.data.species
+        self.reactions = self.data.reactions
+
+        if self.operation.cstr:
+            self.strategy = DynamicConcentration(self.Kpy)
+        else:
+            self.strategy = StaticConcentration(self.Kpy)
+
+        #def strategy_solver(self):
         self.results = self.strategy.solver()
+        if np.any(self.results.theta < 0):
+            self.writer.logger.error("Solution contains negative values")
+
+
