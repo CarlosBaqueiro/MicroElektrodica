@@ -11,10 +11,11 @@ setup(
     long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
-    packages=find_packages(where="melektrodica"),
-    package_dir={"": "melektrodica"},
+    packages=find_packages(where="melektrodica", exclude=["tests", "tests.*"]),
+    package_dir={"melektrodica": "melektrodica"},
     include_package_data=True,
     install_requires=[
         "pytest",
@@ -23,10 +24,6 @@ setup(
         "pandas",
         "matplotlib",
         "networkx",
-        "copy",
-        "warnings",
-        "os",
-        "re",
     ],
     python_requires=">=3.6",
 )
