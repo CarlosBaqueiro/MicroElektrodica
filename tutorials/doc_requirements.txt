@@ -1,0 +1,16 @@
+# Pinned dependencies for reproducible builds with Python >=3.6
+
+# Sphinx: The main tool for generating documentation in multiple formats
+sphinx==7.2.6
+
+# Read the Docs theme for clean and professional-looking HTML documentation
+sphinx-rtd-theme==2.0.0
+
+# Extension to include Jupyter Notebooks (.ipynb) in the documentation
+nbsphinx==0.9.3
+
+# Extension to link external Jupyter Notebooks from other directories or repositories
+nbsphinx-link==1.3.0
+
+# Extension for managing citations and bibliography using BibTeX files (.bib)
+sphinxcontrib-bibtex==2.6.1

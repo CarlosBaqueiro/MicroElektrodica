@@ -1,48 +1,51 @@
-collector module
+μElektrodica
 =================
-..automodule:: melektrodica.calculator
+
+Collector Module
+----------------
+.. automodule:: melektrodica.collector
    :members:
    :undoc-members:
    :show-inheritance:
 
-kpynetic module
-=================
-..automodule:: melektrodica.kpynetic
+Kpynetic Module
+----------------
+.. automodule:: melektrodica.kpynetic
    :members:
    :undoc-members:
    :show-inheritance:
 
-calculator module
-=================
-..automodule:: melektrodica.calculator
+Calculator Module
+-----------------
+.. automodule:: melektrodica.calculator
    :members:
    :undoc-members:
    :show-inheritance:
 
-fitter module
-=================
-..automodule:: melektrodica.fitter
+Fitter Module
+-------------
+.. automodule:: melektrodica.fitter
    :members:
    :undoc-members:
    :show-inheritance:
 
-coordinator module
-=================
-..automodule:: melektrodica.coordinator
+Coordinator Module
+------------------
+.. automodule:: melektrodica.coordinator
    :members:
    :undoc-members:
    :show-inheritance:
 
-grapher module
-=================
-..automodule:: melektrodica.graher
+Grapher Module
+--------------
+.. automodule:: melektrodica.grapher
    :members:
    :undoc-members:
    :show-inheritance:
 
-writer module
-=================
-..automodule:: melektrodica.writer
+Writer Module
+-------------
+.. automodule:: melektrodica.writer
    :members:
    :undoc-members:
    :show-inheritance:
