@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import copy
-from melektrodica import Collector, Calculator, Coordinate, Fitter
+from melektrodica import Collector, Calculator, Coordinator, Fitter
 
 
 # for debugging

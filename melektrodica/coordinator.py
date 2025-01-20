@@ -8,7 +8,7 @@ from .kpynetic import Kpynetic
 from .tools import Tool
 
 
-class CoordinatorReactions:
+class Coordinator:
     def __init__(self, kpy):
         self.Kpy = copy.deepcopy(kpy)
         self.data = self.Kpy.data
