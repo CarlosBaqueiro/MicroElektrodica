@@ -51,7 +51,7 @@ napoleon_google_docstring = True
 # napoleon_use_ivar = True  # option for attribute section formatting
 # napoleon_use_param = False  # option for parameter section formatting
 # viewcode_import = True  # tries to find the source files
-#bibtex_bibfiles = ['bib.bib']
+bibtex_bibfiles = ['bib.bib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

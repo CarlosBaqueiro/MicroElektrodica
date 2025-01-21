@@ -9,10 +9,9 @@ Overview
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
     Overview <self>
-    installation
-    tutorials
-    development
-    apidoc
+    Installation <installation>
+    Tutorials <tutorials>
+    Development <development>
+    API Documentation <apidoc>

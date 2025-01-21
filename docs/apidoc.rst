@@ -9,4 +9,5 @@ API Documentation
 
 .. toctree::
    :maxdepth: 1
-    apidoc-pages/melektrodica
+
+   A <apidoc-pages/melektrodica>

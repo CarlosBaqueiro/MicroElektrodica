@@ -9,7 +9,8 @@
 """
 
 import unittest
-from melektrodica import *
+import numpy as np
+from melektrodica.kpynetic import FreeEnergy, RateConstants, ReactionRate
 
 
 class TestFreeEnergy(unittest.TestCase):
@@ -41,7 +42,8 @@ class TestFreeEnergy(unittest.TestCase):
     """
 
     def setUp(self):
-        self.FreeEnergy = FreeEnergy()
+        self.data = None
+        self.FreeEnergy = FreeEnergy(self.data)
 
     def test_reaction_positive_values(self):
         upsilon = np.array([1, -1, -1])
@@ -82,27 +84,30 @@ class TestRateConstants(unittest.TestCase):
     """
 
     def setUp(self):
-        self.rate_constants = RateConstants()
+        self.data = self
+        self.data.parameters = self
+        self.data.reactions = self
+        self.RateConstants= RateConstants(self.data)
 
     def test_constant(self):
         class Parameters:
-            T = 300
+            temperature = 300
 
-        self.rate_constants.data = self
-        self.rate_constants.data.parameters = Parameters()
+        self.RateConstants.data = self
+        self.RateConstants.data.parameters = Parameters()
 
         pre_exponential = 2
         experimental = 2
         chemical = 10
-        electrical = 5
+        electronic = 5
         expected_result = (
-            pre_exponential
-            * experimental
-            * np.exp(-(chemical + electrical) / (8.617333262145e-5) / 300)
+                pre_exponential
+                * experimental
+                * np.exp(-(chemical + electronic) / (8.617333262145e-5) / 300)
         )
 
-        result = self.rate_constants.constant(
-            pre_exponential, experimental, chemical, electrical
+        result = self.RateConstants.constant(
+            pre_exponential, experimental, chemical, electronic
         )
         self.assertAlmostEqual(result, expected_result, places=6)
 
@@ -110,23 +115,24 @@ class TestRateConstants(unittest.TestCase):
         forward_constants = 5
         backward_constants = 3
         expected_result = np.array([forward_constants, backward_constants])
-        result = RateConstants.experimental(forward_constants, backward_constants)
+        result = self.RateConstants.experimental(forward_constants, backward_constants)
         np.testing.assert_array_equal(result, expected_result)
 
-    def test_chemical(self):
-        G_activation = 100
-        DG_reaction = 80
-        ne = 1
-        expected_result = np.array([G_activation, G_activation + DG_reaction])
-        result = RateConstants.chemical(G_activation, DG_reaction, ne)
+    def test_thermodynamic(self):
+        G_formation = np.array([100])
+        G_activation = np.array([80])
+        upsilon = np.array([1.0])
+        expected_result = np.array([G_activation, G_activation -(upsilon @ G_formation)])
+        result = self.RateConstants.thermodynamic(G_activation, G_activation, upsilon)
+        print(expected_result, result)
         np.testing.assert_array_equal(result, expected_result)
 
-    def test_electrical(self):
+    def test_electronic(self):
         eta = 0.1
         ne = 2
         beta = 0.5
         expected_result = np.array([-ne * beta * eta, ne * (1 - beta) * eta])
-        result = RateConstants.electrical(eta, ne, beta)
+        result = self.RateConstants.electronic(eta, ne, beta)
         np.testing.assert_array_equal(result, expected_result)
 
 
