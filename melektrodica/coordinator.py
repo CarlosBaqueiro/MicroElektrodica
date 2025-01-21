@@ -117,7 +117,7 @@ class Coordinator:
         colors = plt.cm.viridis(np.linspace(0, 1, len(potential)))
         colors[0] = plt.cm.tab10(1)
         for j, eta in enumerate(potential):
-            energies = - self.get_energies(self.sigma[p], reactions, eta)
+            energies = self.get_energies(self.sigma[p], reactions, eta)
             print(f'eta = {eta} V, energies = {energies} eV,')
             color = colors[j]
             potential_legend.append(
@@ -134,21 +134,10 @@ class Coordinator:
         plt.plot([1 + plateau, 2 * len(reactions) + 1 + plateau], [0, 0], color='gray', linestyle="--", linewidth=1)
         plt.xlim(1 - plateau, 2 * len(reactions) + 1 + plateau)
         plt.xlabel("Reaction Coordinate")
-        plt.ylabel(r"$-\Delta G_{r,\xi_h}$ [eV]")
+        plt.ylabel(r"$\Delta G_{r,\xi_h}$ [eV]")
         plt.xticks(range(1, len(energies) + 1), x_label)
         plt.legend(handles=potential_legend)
         plt.minorticks_on()
-        equation = r"$\mathrm{H_2}$ $\overset{\mathrm{OA}}{\leftrightarrow}$ $\mathrm{H^*}$ $\leftrightarrow[\mathrm{OD}]$ $\mathrm{H^+ + e^-}$"
-        center_position = len(reactions) + plateau
-        ax.text(
-            center_position,
-            -0.2,
-            equation,
-            fontsize=12,
-            color="black",
-            ha="center",
-            va="center"
-        )
         #ax.tick_params(axis='both', which='both', direction='in')
         ax.tick_params(axis='x', which='minor', bottom=False)
         plt.tight_layout()

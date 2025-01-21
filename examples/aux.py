@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import copy
 from matplotlib.lines import Line2D
 
-from melektrodica import Collector, Fitter, Calculator, CoordinatorReactions, Kpynetic, Grapher
+from melektrodica import Collector, Fitter, Calculator, Coordinator, Kpynetic, Grapher
 from melektrodica.constants import F, k_B, h
 
 
@@ -112,7 +112,7 @@ class Hydrogen2:
         eta = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
         fname = "Wang2007Hydrogen"
         self.Kpy = Kpynetic(self.data)
-        coo = CoordinatorReactions(self.Kpy)
+        coo = Coordinator(self.Kpy)
         Coord = coo.plot_rxn_coords_potential(source, target, eta, fname)
         print(k_B * self.data.parameters.temperature / h)
         print(k_B * self.data.parameters.temperature * F * 2 / h)
@@ -222,7 +222,8 @@ class Oxygen2:
         self.data = Collector(directory)
         #self.data.reactions.ga = np.array([258, 459, 502, 455]) * 1e-3
         #self.data.species.g_formation_ads = np.array([-477, -120]) * 1e-3
-        coo = CoordinatorReactions(self.data)
+        self.Kpy = Kpynetic(self.data)
+        coo = Coordinator(self.Kpy)
         source = self.data.species.reactants[0]
         target = self.data.species.products[0]
         eta = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
@@ -232,6 +233,6 @@ class Oxygen2:
 
 if __name__ == "__main__":
     #Hydrogen()
-    #Hydrogen2()
-    Oxygen()
-    #Oxygen2()
+    Hydrogen2()
+    #Oxygen()
+    Oxygen2()

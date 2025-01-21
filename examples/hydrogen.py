@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import copy
-from melektrodica import Collector, Calculator, Coordinator, Fitter
+from melektrodica import Collector, Calculator, Coordinator, Fitter, Kpynetic
 
 
 # for debugging
@@ -30,15 +30,17 @@ class Hydrogen:
         self.operation = self.data.parameters
         self.species = self.data.species
         self.reactions = self.data.reactions
-
-        self.melek_hb = Calculator(self.data)
+        self.Kpy = Kpynetic(self.data)
+        self.melek_hb = Calculator(self.Kpy)
 
         # Atop
         self.data_atop = Collector(directory)
         self.data_atop.species.g_formation_ads = np.array([75]) * 1e-3
         self.data_atop.reactions.ga = np.array([196, 294, 48]) * 1e-3
 
-        self.melek_atop = Calculator(self.data_atop)
+        self.Kpy_atop = Kpynetic(self.data_atop)
+
+        self.melek_atop = Calculator(self.Kpy_atop)
 
         # Wang's Results
         h_hb = np.array(
@@ -163,27 +165,6 @@ class Hydrogen:
 
         vdata_hb = j_hb[:, 0] * 1e-3
         jdata_hb = j_hb[:, 1]
-
-        F_hb = Fitter(self.data, vdata_hb, jdata_hb)
-        self.data.reactions.ga = F_hb.ga_fit
-        self.data.species.g_formation_ads = F_hb.gf_fit
-        print('\ng_fit:')
-        print('ga: ', self.data.reactions.ga)
-        print('g_formation: ', self.data.species.g_formation_ads)
-
-        self.nmelek_hb = Calculator(self.data)
-
-        vdata_atop = j_atop[:, 0] * 1e-3
-        jdata_atop = j_atop[:, 1]
-
-        F_atop = Fitter(self.data_atop, vdata_atop, jdata_atop)
-        self.data_atop.reactions.ga = F_atop.ga_fit
-        self.data_atop.species.g_formation_ads = F_atop.gf_fit
-        print('\ng_fit:')
-        print('ga: ', self.data_atop.reactions.ga)
-        print('g_formation: ', self.data_atop.species.g_formation_ads)
-
-        self.nmelek_atop = Calculator(self.data_atop)
 
         species = {"H/B": ("o", ":", h_hb), "Atop": ("x", "-", h_atop)}
 

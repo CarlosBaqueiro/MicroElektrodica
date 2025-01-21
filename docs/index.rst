@@ -1,17 +1,18 @@
-.. MicroElektrodica documentation master file, created by
-sphinx-quickstart on Mon Jan 20 22:28:36 2025.
-You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive.
+.. _index:
 
-MicroElektrodica documentation
-==============================
+.. image:: _static/microelektrodica_logo.png
+    :width: 400
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+Overview
+============
+μElektrodica is an open--source tool for Electrocatalytic Reactions Microkinetic Modeling developed in Python, featuring a modular architecture that enables easy understanding of the algorithm and rapid adaptation to available experimental or thermodynamic parameters.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+    Overview <self>
+    installation
+    tutorials
+    development
+    apidoc
