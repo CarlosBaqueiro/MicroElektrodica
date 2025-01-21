@@ -6,70 +6,71 @@
 
 # -- Path setup --------------------------------------------------------------
 
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+#
 import os
 import sys
+from melektrodica import __version__
 
-# Safely import project version
-try:
-    from melektrodica import __version__ as melektrodica_version
+sys.path.insert(0, os.path.abspath("../"))
 
-    version = melektrodica_version
-    release = melektrodica_version
-except ImportError:
-    version = "unknown"
-    release = "unknown"
-    sys.stderr.write("Warning: 'μElektrodica' module not found. Unable to set version.\n")
-
-# Add the root project directory to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
+# -- Project information -----------------------------------------------------
 
 # -- Project information -----------------------------------------------------
 
 project = "μElektrodica"
 copyright = "Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez"
 author = "μElektrodica Developers"
+version = __version__
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or custom ones.
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+
 language = 'en'
 
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon",
+    'sphinx.ext.napoleon',
     "nbsphinx",
     "nbsphinx_link",
-    "sphinxcontrib.bibtex",
+    'sphinxcontrib.bibtex',
 ]
 
-# Sphinx-napoleon configuration (for Google/Numpy style docstrings)
 napoleon_google_docstring = True
+# napoleon_use_rtype = False  # option for return section formatting
+# numpydoc_show_class_members = True
+# numpydoc_show_inherited_class_members = False
+# numpydoc_class_members_toctree = False
+# napoleon_use_ivar = True  # option for attribute section formatting
+# napoleon_use_param = False  # option for parameter section formatting
+# viewcode_import = True  # tries to find the source files
+#bibtex_bibfiles = ['bib.bib']
 
-# Configuration for adding bibliographies
-bibtex_bibfiles = ["bib.bib"]
-
-# Paths for templates and ignored files
+# Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
-exclude_patterns = [
-    "_build",
-    "Thumbs.db",
-    ".DS_Store",
-    "**.ipynb_checkpoints",
-    "**/temp_files/",
-]
+
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", '**.ipynb_checkpoints']
 
 # -- Options for HTML output -------------------------------------------------
 
-# Theme configuration
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+#
 html_theme = "sphinx_rtd_theme"
-html_theme_options = {
-    "collapse_navigation": False,
-    "navigation_depth": 3,
-}
 
-# Uncomment to customize styles
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
-# html_style = "css/my_style.css"
+# html_style = 'css/my_style.css'
