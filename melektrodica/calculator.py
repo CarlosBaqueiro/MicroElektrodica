@@ -218,12 +218,25 @@ class StaticConcentration(BaseConcentration):
 
     def initialize(self):
         """
-        Initializes the potential and adsorbed species arrays.
+        Initializes the system by creating initial values and arrays for the simulation.
 
-        :return: A tuple containing the initialized potential values array
-        and the concatenated initial adsorbed species array.
-        :rtype: tuple
+        This function prepares initial values of the state variables required for a
+        simulation. It initializes two arrays: one for storing function values and
+        another with initial condition values derived from the given data structure.
+        The initial states are related to adsorption species and potential operations.
+
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - fval : ndarray
+                An array initialized with zeros, with shape based on the lengths
+                of potential operations and adsorbed species.
+            - initio : ndarray
+                A 1-dimensional array created by concatenating initial values
+                pertaining to adsorbed species.
         """
+
         fval = np.zeros((len(self.operation.potential), len(self.species.adsorbed)))
         theta0 = np.zeros(len(self.species.adsorbed))
         initio = np.concatenate([theta0])
@@ -240,6 +253,7 @@ class StaticConcentration(BaseConcentration):
                  products, and theta value.
         :rtype: tuple
         """
+
         c_reactants = self.species.c0_reactants
         c_products = self.species.c0_products
         theta = variables
@@ -291,6 +305,7 @@ class DynamicConcentration(BaseConcentration):
         :return: A tuple containing the initial condition vectors.
         :rtype: tuple(np.ndarray, np.ndarray)
         """
+
         fval = np.zeros(
             (
                 len(self.operation.potential),
