@@ -14,7 +14,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    packages=find_packages(where="melektrodica", exclude=["tests", "tests.*"]),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     package_dir={"melektrodica": "melektrodica"},
     include_package_data=True,
     install_requires=[
