@@ -1,5 +1,3 @@
-""" μElektrodica © 2024 """
-
 from .collector import Collector
 from .kpynetic import Kpynetic
 from .calculator import Calculator

@@ -13,7 +13,6 @@
 import os
 import sys
 from melektrodica import __version__
-
 sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
