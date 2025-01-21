@@ -24,6 +24,7 @@ setup(
         "pandas",
         "matplotlib",
         "networkx",
+        "colorlog",
     ],
     python_requires=">=3.6",
 )
