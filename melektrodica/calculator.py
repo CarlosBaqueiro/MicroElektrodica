@@ -218,23 +218,20 @@ class StaticConcentration(BaseConcentration):
 
     def initialize(self):
         """
-        Initializes the system by creating initial values and arrays for the simulation.
+        Initializes the values for subsequent calculations.
 
-        This function prepares initial values of the state variables required for a
-        simulation. It initializes two arrays: one for storing function values and
-        another with initial condition values derived from the given data structure.
-        The initial states are related to adsorption species and potential operations.
+        This method initializes two arrays needed for further computation:
+        - `fval`: A 2D array based on the length of `self.operation.potential`
+          and `self.species.adsorbed`.
+        - `initio`: A 1D concatenated array created from `theta0`.
 
         Returns
         -------
-        tuple
-            A tuple containing:
-            - fval : ndarray
-                An array initialized with zeros, with shape based on the lengths
-                of potential operations and adsorbed species.
-            - initio : ndarray
-                A 1-dimensional array created by concatenating initial values
-                pertaining to adsorbed species.
+        tuple of ndarray
+            A tuple containing two NumPy arrays:
+            - `fval`: A 2D array of zeros with dimensions
+              (len(self.operation.potential), len(self.species.adsorbed)).
+            - `initio`: A 1D array created by concatenating the `theta0` array.
         """
 
         fval = np.zeros((len(self.operation.potential), len(self.species.adsorbed)))
@@ -249,6 +246,7 @@ class StaticConcentration(BaseConcentration):
 
         :param variables: The variables to unzip.
         :type variables: any
+
         :return: A tuple containing the initial concentrations of reactants, initial concentrations of
                  products, and theta value.
         :rtype: tuple

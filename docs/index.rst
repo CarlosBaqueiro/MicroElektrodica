@@ -9,7 +9,6 @@ Overview
 
 .. toctree::
    :maxdepth: 1
-   :hidden:
 
     Overview <self>
     Installation <installation>
