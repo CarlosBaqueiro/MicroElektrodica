@@ -1,5 +1,6 @@
-# μElektrodica
+<img src="docs/_static/microelektrodica_logo.png" width="400"/>
 
+# μElektrodica
 Uxmal 1.0.0
 
 A Python Electrochemistry Toolbox for Modeling Microkinetic Electrocatalytic Reactions.
