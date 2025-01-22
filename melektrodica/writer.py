@@ -195,7 +195,7 @@ class Writer:
         if variable == 'Reactions':
             items = fitter.data.reactions.list
             energies = fitter.ga_fit
-            col = 'Free energies of activation reactions [eV]'
+            col = 'Activation energy [eV]'
         elif variable == 'Species':
             items = fitter.data.species.adsorbed
             energies = fitter.gf_fit
