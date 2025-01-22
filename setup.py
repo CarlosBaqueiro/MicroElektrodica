@@ -25,6 +25,7 @@ setup(
         "matplotlib",
         "networkx",
         "colorlog",
+        "tabulate",
     ],
     python_requires=">=3.6",
 )
