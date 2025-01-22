@@ -49,22 +49,30 @@ class Writer:
         file_handler.setFormatter(file_formatter)
         self.logger.addHandler(file_handler)
 
-        # Configure the console handler (logs to the terminal)
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
+        # Check if running in Jupyter Notebook
+        try:
+            get_ipython  # This exists only in Jupyter/IPython environments
+            is_jupyter = True
+        except NameError:
+            is_jupyter = False
 
-        console_formatter = ColoredFormatter(
-            "%(log_color)s%(levelname)s: %(message)s",
-            log_colors={
-                'DEBUG': 'white',
-                'INFO': 'green',
-                'WARNING': 'yellow',
-                'ERROR': 'red',
-                'CRITICAL': 'bold_red',
-            }
-        )
-        console_handler.setFormatter(console_formatter)
-        self.logger.addHandler(console_handler)
+        # Configure the console handler (logs to the terminal) only if NOT in Jupyter
+        if not is_jupyter:
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
+
+            console_formatter = ColoredFormatter(
+                "%(log_color)s%(levelname)s: %(message)s",
+                log_colors={
+                    'DEBUG': 'white',
+                    'INFO': 'green',
+                    'WARNING': 'yellow',
+                    'ERROR': 'red',
+                    'CRITICAL': 'bold_red',
+                }
+            )
+            console_handler.setFormatter(console_formatter)
+            self.logger.addHandler(console_handler)
 
     def message(self, message):
         """

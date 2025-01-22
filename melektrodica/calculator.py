@@ -85,7 +85,7 @@ class BaseConcentration:
         self.fval, initio = self.initialize()
         for i, potential in enumerate(self.operation.potential):
             solution = fsolve(
-                self.steady_state, initio, args=potential, xtol=1e-12, maxfev=2000
+                self.steady_state, initio, args=potential, xtol=1e-9, maxfev=2000
             )
             self.c_reactants[i], self.c_products[i], self.theta[i] = (
                 self.unzip_variables(solution)
@@ -373,39 +373,39 @@ class DynamicConcentration(BaseConcentration):
 
 class Calculator:
     """
-    Represents a computational tool for executing operations, simulations, and
-    evaluations within a specified system.
+    Represents a computational calculator for processing data and solving reactions
+    using either dynamic or static concentration strategies.
 
-    Provides mechanisms for handling system data, operational parameters,
-    and computational strategies, alongside logging features for tracking
-    execution and results. Assigns specific calculation strategies dynamically
-    based on the characteristics of the operational configuration.
+    This class is designed to initialize, define, and execute processes related
+    to the input kpy data structure. It manages various components such as species,
+    reactions, operational parameters, and potential fields while selecting
+    appropriate strategies for computation. Outputs are logged and validated to
+    ensure consistency and correctness.
 
-    Attributes:
-        name: str
-            The name assigned to the calculator instance. If not provided, defaults to 'melek'.
-        writer: Writer
-            An instance of the Writer class used for logging and messaging.
-        Kpy: <type>
-            A deep copy of the input kpy object used for operations and computations.
-        data: <type>
-            Holds the data contained within the Kpy object, representing input information for the calculations.
-        operation: <type>
-            References the `parameters` attribute of the data object and represents operational parameters.
-        potential: <type>
-            References the `potential` attribute within the operational parameters.
-        species: <type>
-            Represents all species involved in the system, extracted from the data object.
-        reactions: <type>
-            Represents all reactions within the system, extracted from the data object.
-        strategy: DynamicConcentration or StaticConcentration
-            Chooses between dynamic or static concentration strategies based on the cstr attribute in operation.
-        results: <type>
-            Stores the output of the solver executed from the selected strategy.
-
-    Raises:
-        ValueError
-            Raised if the results from the strategy solver contain negative values in `theta`.
+    Attributes
+    ----------
+    name : str
+        The name assigned to the calculator instance. Defaults to 'melek' if not provided.
+    writer : Writer
+        An instance of the Writer class used for logging and messaging activities.
+    Kpy
+        A deep copy of the input kpy object used internally for operations and computations.
+    data
+        Extracted data from the Kpy object, representing information required for calculations.
+    operation
+        Operational parameters extracted from the `parameters` attribute of the data object.
+    potential
+        Represents the potential field used in computational operations and extracted from
+        the operational parameters.
+    species
+        All species involved in the computational system, extracted from the data object.
+    reactions
+        All reactions within the system, extracted from the data object.
+    strategy : DynamicConcentration or StaticConcentration
+        Indicates chosen computational strategy, either dynamic or static, based on
+        the operation's `cstr` attribute.
+    results
+        The output produced by the solver associated with the selected computational strategy.
     """
 
     def __init__(self, kpy, name=None):
