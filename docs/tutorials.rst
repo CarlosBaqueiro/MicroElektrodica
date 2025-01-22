@@ -6,4 +6,4 @@ Tutorials
 .. nbgallery::
     :caption: Tutorials
 
-    Tutorials <tutorials/melektrodica_tutorial_hydrogen.ipynb>
+    Hydrogen <tutorials/melektrodica_tutorial_hydrogen.ipynb>

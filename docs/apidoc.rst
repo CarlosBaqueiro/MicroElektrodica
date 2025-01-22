@@ -9,6 +9,7 @@ API Documentation
 
 .. toctree::
    :maxdepth: 1
+   :caption: Modules:
 
    Collector <apidoc-pages/collector>
    Kpynetic <apidoc-pages/kpynetic>
