@@ -11,6 +11,7 @@
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
+from IPython.display import clear_output
 from scipy.optimize import Bounds, differential_evolution
 from .calculator import Calculator
 from .writer import Writer
@@ -42,7 +43,7 @@ class Fitter(Calculator):
         self.potential_data = copy.deepcopy(potential_data)
         self.j_data = copy.deepcopy(j_data)
         self.data.parameters.potential = self.potential_data
-        super().__init__(self.data)
+        super().__init__(self.Kpy)
         self.error_evolution = []
 
         g0 = np.concatenate([self.data.reactions.ga, self.data.species.g_formation_ads])
@@ -129,11 +130,14 @@ class Fitter(Calculator):
             raise
 
     def display_error_evolution(self, xk, convergence=0):
-        plt.clf()
+        clear_output(wait=True)
+        plt.figure()
         plt.plot(self.error_evolution, label="Objective function value")
         plt.yscale("log")
         plt.xlabel("Iterations")
         plt.ylabel("Objective function value")
         plt.title("Runtime optimization")
         plt.legend()
+        plt.show()
         plt.pause(0.01)
+
