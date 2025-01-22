@@ -1,4 +1,4 @@
-<img src="docs/_static/microelektrodica_logo.png" width="400"/>
+<img src="docs/_static/microelektrodica_logo.png" width="800"/>
 
 # μElektrodica
 Uxmal 1.0.0
