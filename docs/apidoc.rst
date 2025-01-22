@@ -10,4 +10,10 @@ API Documentation
 .. toctree::
    :maxdepth: 1
 
-   A <apidoc-pages/melektrodica>
+   Collector <apidoc-pages/collector>
+   Kpynetic <apidoc-pages/kpynetic>
+   Calculator <apidoc-pages/calculator>
+   Fitter <apidoc-pages/fitter>
+   Coordinator <apidoc-pages/coordinator>
+   Grapher <apidoc-pages/grapher>
+   Writer <apidoc-pages/writer>
