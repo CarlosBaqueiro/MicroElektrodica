@@ -107,8 +107,9 @@ class Hydrogen2:
         self.data.species.g_formation_ads = np.array([75]) * 1e-3
         self.data.reactions.ga = np.array([196, 294, 48]) * 1e-3
 
-        source = self.data.species.reactants[0]
-        target = self.data.species.products[0]
+        #source = self.data.species.reactants[0]
+        #target = self.data.species.products[0]
+        source, target = ['H2', 'H+']
         eta = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
         fname = "Wang2007Hydrogen"
         self.Kpy = Kpynetic(self.data)
@@ -223,16 +224,17 @@ class Oxygen2:
         #self.data.reactions.ga = np.array([258, 459, 502, 455]) * 1e-3
         #self.data.species.g_formation_ads = np.array([-477, -120]) * 1e-3
         self.Kpy = Kpynetic(self.data)
-        coo = Coordinator(self.Kpy)
+        #coo = Coordinator(self.Kpy)
         source = self.data.species.reactants[0]
         target = self.data.species.products[0]
+        print(source)
         eta = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
         fname = "Moore2013Oxygen"
-        Coord = coo.plot_rxn_coords_potential(source, target, eta, fname)
+        Coordinator(self.Kpy).plot_rxn_coords_potential(source, target, eta, fname)
 
 
 if __name__ == "__main__":
     #Hydrogen()
     Hydrogen2()
     #Oxygen()
-    Oxygen2()
+    #Oxygen2()

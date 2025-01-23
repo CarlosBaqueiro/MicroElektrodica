@@ -37,6 +37,7 @@ class Coordinator:
     data : object
         Direct access to the data contained within `Kpy`.
     """
+
     def __init__(self, kpy):
         self.Kpy = copy.deepcopy(kpy)
         self.data = self.Kpy.data
@@ -323,7 +324,7 @@ class Coordinator:
         colors[0] = plt.cm.tab10(1)
         for j, eta in enumerate(potential):
             energies = self.get_energies(self.sigma[p], reactions, eta)
-            print(f'eta = {eta} V, energies = {energies} eV,')
+            #print(f'eta = {eta} V, energies = {energies} eV,')
             color = colors[j]
             potential_legend.append(
                 Line2D([0], [0], linestyle="-", color=color, label=rf"$\eta = {eta}$ V")  # Assuming eta is a potential
