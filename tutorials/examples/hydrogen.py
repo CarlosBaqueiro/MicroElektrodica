@@ -166,6 +166,27 @@ class Hydrogen:
         vdata_hb = j_hb[:, 0] * 1e-3
         jdata_hb = j_hb[:, 1]
 
+        F_hb = Fitter(self.Kpy, vdata_hb, jdata_hb)
+        self.data.reactions.ga = F_hb.ga_fit
+        self.data.species.g_formation_ads = F_hb.gf_fit
+        print('\ng_fit:')
+        print('ga: ', self.data.reactions.ga)
+        print('g_formation: ', self.data.species.g_formation_ads)
+        self.Kpy = Kpynetic(self.data)
+        self.nmelek_hb = Calculator(self.Kpy)
+
+        vdata_atop = j_atop[:, 0] * 1e-3
+        jdata_atop = j_atop[:, 1]
+
+        F_atop = Fitter(self.Kpy_atop, vdata_atop, jdata_atop)
+        self.data_atop.reactions.ga = F_atop.ga_fit
+        self.data_atop.species.g_formation_ads = F_atop.gf_fit
+        print('\ng_fit:')
+        print('ga: ', self.data_atop.reactions.ga)
+        print('g_formation: ', self.data_atop.species.g_formation_ads)
+        self.Kpy_atop = Kpynetic(self.data_atop)
+        self.nmelek_atop = Calculator(self.Kpy_atop)
+
         species = {"H/B": ("o", ":", h_hb), "Atop": ("x", "-", h_atop)}
 
         fname = os.path.join(directory, "WangHydrogen_theta.png")
