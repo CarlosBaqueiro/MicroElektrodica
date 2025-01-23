@@ -2,9 +2,8 @@
 
 Tutorials
 ================
+.. toctree::
+   :maxdepth: 1
 
-.. nbgallery::
-    :caption: Tutorials
-
-    Hydrogen Electro-Oxidation Reaction <tutorials/melektrodica_tutorial_hydrogen.ipynb>
-    Oxygen Electro-Reduction Reaction <tutorials/melektrodica_tutorial_oxygen.ipynb>
+   Hydrogen Electro-Oxidation Reaction <tutorials/melektrodica_tutorial_hydrogen>
+   Oxygen Electro-Reduction Reaction <tutorials/melektrodica_tutorial_oxygen>
