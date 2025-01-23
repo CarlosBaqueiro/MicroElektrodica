@@ -204,6 +204,7 @@ class RateConstants:
               energy of the reaction.
 
         """
+
         dg_reaction = FreeEnergy.reaction(upsilon, g_formation)
         return np.array([g_activation, g_activation + dg_reaction])
 
@@ -243,7 +244,8 @@ class ReactionRate:
     This class provides functionalities to calculate reaction rates based on
     the law of mass action and power law kinetics. It is designed to handle
     reaction rate constants, reactants and product concentrations, and
-    catalyst site occupancy to compute reaction mechanisms effectively.
+    catalyst site occupancy to compute reaction mechanisms effectively :cite:p:`motagamwala2018microkinetic,
+    Motagamwala2020, bieniasz2015, razdan2023`.
 
     .. math::
 
@@ -295,6 +297,7 @@ class ReactionRate:
         np.ndarray
             The computed reaction rate for each reaction across the system.
         """
+
         concentrations = self.concentrate(c_reactants, c_products, theta)
         rate = self.power_law(concentrations, upsilon)
         return np.sum(k_rate * rate, axis=0)
@@ -321,6 +324,7 @@ class ReactionRate:
             A 1-dimensional array showing the fraction of empty sites on the catalytic
             surface.
         """
+
         return np.array(1 - self.species.ns_catalyst @ theta)
 
     def concentrate(self, c_reactants, c_products, theta):
@@ -346,6 +350,7 @@ class ReactionRate:
             A concatenated array containing the concentrations of reactants, products, the
             provided `theta`, and the result of the `empty_sites` method.
         """
+
         return np.concatenate([c_reactants, c_products, theta, self.empty_sites(theta)])
 
     def power_law(self, concentration: ndarray, upsilon: ndarray) -> ndarray:
@@ -372,6 +377,7 @@ class ReactionRate:
             row corresponds to the computed power law products of concentration and positive
             upsilon under specific conditions.
         """
+
         return np.array(
             [
                 np.prod(concentration ** (-upsilon * (upsilon < 0)), axis=1),
@@ -483,6 +489,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         dg_reaction : numpy.ndarray or None
             Free energy of reaction, derived from thermodynamic contributions if configured.
         """
+
         self.writer = Writer()
         self.writer.message(f"*** Kpynetic :  ***")
         self.data = copy.deepcopy(data)
@@ -562,6 +569,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         to compute the full rate constant. The rate constant is then used
         to determine the overall reaction rate `v`.
         """
+
         eta = potential
         self.electronic_part = self.electrode * RateConstants.electronic(
             eta, self.reactions.ne, self.reactions.beta
@@ -572,7 +580,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             thermochemical=self.thermochemical_part,
             electronic=self.electronic_part,
         )
-        self.v = self.rate(
+        self.nu = self.rate(
             self.k_rate, c_reactants, c_products, theta, self.reactions.upsilon
         )
 
@@ -631,7 +639,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             The total electric current resulting from the electrochemical reactions.
         """
         self.foverpotential(potential, c_reactants, c_products, theta)
-        return np.dot(self.reactions.ne, self.v) * F
+        return np.dot(self.reactions.ne, self.nu) * F
 
     def dcdt(self, rate, upsilon: np.ndarray) -> np.ndarray:
         """
