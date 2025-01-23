@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    μElektrodica © 2024
+    μElektrodica © 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -179,7 +179,7 @@ class BaseConcentration:
         c_reactants, c_products, theta = self.unzip_variables(variables)
         rhs = self.right_hand_side(c_reactants, c_products, theta)
         self.Kpy.foverpotential(potential, c_reactants, c_products, theta)
-        return self.Kpy.dcdt(self.Kpy.v, self.reactions.nux) - rhs
+        return self.Kpy.dcdt(self.Kpy.v, self.reactions.upsilonx) - rhs
 
     def current(self, variables, potential):
         """

@@ -1,6 +1,6 @@
 """
 
-    μElektrodica © 2024
+    μElektrodica © 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -33,7 +33,7 @@ class DataParameters:
     :type variables_list: numpy.ndarray
     :ivar potential: A numpy array representing the range of potential values.
     :type potential: numpy.ndarray
-    :ivar tempe: Temperature in Kelvin after unit conversion.
+    :ivar temperature: Temperature in Kelvin after unit conversion.
     :type T: float
     :ivar anode: Electrode, True for anode, False for cathode.
     :type anode: bool
@@ -109,7 +109,7 @@ class DataParameters:
         self.tst = initialize(values, self.parameters_list, "Transient state theory")
         self.js = initialize(values, self.variables_list, "j*")
         self.experimental = initialize(values, self.parameters_list, "Experimental")
-        self.chemical = initialize(values, self.parameters_list, "Chemical")
+        self.thermochemical = initialize(values, self.parameters_list, "Thermochemical")
         # Rate Constants
         # Pre-exponential
         self.pre_exponential = float(values[self.variables_list == "A"])
@@ -129,7 +129,7 @@ class DataParameters:
             writer.message(f"Experimental kinetics rate constants: {self.experimental}")
 
         # Check Chemical part details
-        if self.chemical:
+        if self.thermochemical:
             message = "Thermochemical part details:\n"
             self.dg_reaction = initialize(values, self.variables_list, "DG_reaction")
             self.g_formation = initialize(values, self.variables_list, "G_formation")
@@ -200,8 +200,8 @@ class DataSpecies:
     :type c0_products: numpy.ndarray
     :ivar list: Combined list of all species including an electron placeholder.
     :type list: list of str
-    :ivar nu_catalyst: Matrix indicating presence of adsorbed species in each catalyst.
-    :type nu_catalyst: numpy.ndarray
+    :ivar ns_catalyst: Matrix indicating presence of adsorbed species in each catalyst.
+    :type ns_catalyst: numpy.ndarray
     :ivar G_formation_rct: Gibbs free energy of formation for reactants.
     :type G_formation_rct: numpy.ndarray
     :ivar G_formation_ads: Gibbs free energy of formation for adsorbed species.
@@ -242,7 +242,7 @@ class DataSpecies:
         )
         writer.message("Initial concentrations processed.")
 
-        self.nu_catalyst = np.zeros((len(self.catalyst), len(self.adsorbed)))
+        self.ns_catalyst = np.zeros((len(self.catalyst), len(self.adsorbed)))
         if "Sites" in header:
             sites = raw_data[:, header.index("Sites")]
         else:
@@ -255,10 +255,10 @@ class DataSpecies:
             nsites = sites[raw_data[:, header.index("Catalyst")] == self.catalyst[i]]
             for specie, ns in zip(species_in_catalyst, nsites):
                 if specie in self.adsorbed:
-                    self.nu_catalyst[i, self.adsorbed.index(specie)] = float(ns)
+                    self.ns_catalyst[i, self.adsorbed.index(specie)] = float(ns)
         writer.message("Catalyst matrix created.")
 
-        if parameters.chemical:
+        if parameters.thermochemical:
             Collector.column_exists("DG_formation", header, species_file, writer)
             if parameters.g_formation:
                 self.g_formation_rct = np.array(
@@ -281,35 +281,38 @@ class DataSpecies:
 
 class DataReactions:
     """
-    Manages and processes reaction data.
+    Represents a system to process and manage reaction data from a given input file.
 
-    This class reads reaction data from a file, processes it to extract various
-    parameters and coefficients, and makes the data accessible for further
-    analysis. It also handles different experimental and chemical conditions
-    based on the provided parameters.
+    The class extracts and organizes reaction data into matrices for further processing,
+    depending on specified parameters and species data. It is designed to handle
+    stoichiometric coefficients, catalysts, adsorbates, and other chemical or experimental
+    parameters for reaction studies.
 
-    :ivar list: List of reaction IDs.
-    :type list: list
-    :ivar beta: Array of Beta parameters for the reactions.
-    :type beta: numpy.ndarray
-    :ivar nu: Stoichiometric matrix for the reactions.
-    :type nu: numpy.ndarray
-    :ivar ne: Array of the number of electrons transferred in the reactions.
-    :type ne: numpy.ndarray
-    :ivar nuc: Stoichiometric matrix without catalysts.
-    :type nuc: numpy.ndarray
-    :ivar nua: Stoichiometric matrix for adsorbates.
-    :type nua: numpy.ndarray
-    :ivar nux: Stoichiometric matrix adjusted for CSTR or experimental conditions.
-    :type nux: numpy.ndarray
-    :ivar k_f: Array of forward reaction rate constants (optional).
-    :type k_f: numpy.ndarray
-    :ivar k_b: Array of backward reaction rate constants (optional).
-    :type k_b: numpy.ndarray
-    :ivar Ga: Array of Gibbs free energy changes (optional).
-    :type Ga: numpy.ndarray
-    :ivar DG_reaction: Array of Delta G reaction values (optional).
-    :type DG_reaction: numpy.ndarray
+    Attributes
+    ----------
+    list : list
+        List of reaction IDs extracted from the input file.
+    beta : numpy.ndarray
+        Array of Beta values for the reactions, interpreted as floats.
+    upsilon : numpy.ndarray
+        Reaction matrix including all stoichiometric coefficients and catalysts.
+    ne : numpy.ndarray
+        Number of electrons transferred for each reaction.
+    upsilon_c : numpy.ndarray
+        Reaction coefficients matrix excluding catalysts.
+    upsilon_a : numpy.ndarray
+        Matrix of coefficients for adsorbed species only.
+    upsilonx : numpy.ndarray
+        Reaction matrix selected for specific model usage (e.g. without catalysts or
+        limited to adsorbates), determined by input parameters.
+    k_f : numpy.ndarray, optional
+        Array of forward kinetic rate constants for experimental data (if applicable).
+    k_b : numpy.ndarray, optional
+        Array of backward kinetic rate constants for experimental data (if applicable).
+    ga : numpy.ndarray, optional
+        Free energy of activation values for thermochemical data (if applicable).
+    dg_reaction : numpy.ndarray, optional
+        Gibbs free energy changes for reactions, if available in data and requested.
     """
 
     def __init__(self, reaction_file, parameters, species, writer):
@@ -321,7 +324,7 @@ class DataReactions:
         self.beta = np.array(raw_data[:, header.index("Beta")].astype(float))
 
         Collector.column_exists("Reactions", header, reaction_file, writer)
-        self.nu = np.zeros((len(self.list), len(species.list)))
+        self.upsilon = np.zeros((len(self.list), len(species.list)))
         for i in range(len(self.list)):
             r = raw_data[:, header.index("Reactions")][i]
             left, right = re.split(r"<->", r)
@@ -330,26 +333,26 @@ class DataReactions:
                 left, species.list
             )
             for specie, coeff in zip(species_in_reaction, stoichiometric):
-                self.nu[i, species.list.index(specie)] = -coeff
+                self.upsilon[i, species.list.index(specie)] = -coeff
 
             species_in_reaction, stoichiometric = self.process_reaction(
                 right, species.list
             )
             for specie, coeff in zip(species_in_reaction, stoichiometric):
-                self.nu[i, species.list.index(specie)] = coeff
+                self.upsilon[i, species.list.index(specie)] = coeff
 
-        self.ne = self.nu[:, -1]  # Number of electrons transferred
-        self.nu = self.nu[:, :-1]  # All coefficients, catalysts included
-        self.nuc = self.nu[
-                   :, : -len(species.catalyst)
-                   ]  # All coefficients, without catalysts
-        self.nua = self.nuc[:, -len(species.adsorbed):]  # Adsorbates coefficients
+        self.ne = self.upsilon[:, -1]  # Number of electrons transferred
+        self.upsilon = self.upsilon[:, :-1]  # All coefficients, catalysts included
+        self.upsilon_c = self.upsilon[
+                         :, : -len(species.catalyst)
+                         ]  # All coefficients, without catalysts
+        self.upsilon_a = self.upsilon_c[:, -len(species.adsorbed):]  # Adsorbates coefficients
         writer.message("Reaction matrix processed.")
 
         if parameters.cstr:
-            self.nux = self.nuc
+            self.upsilonx = self.upsilon_c
         else:
-            self.nux = self.nua
+            self.upsilonx = self.upsilon_a
 
         if parameters.experimental:
             Collector.column_exists("k_f", header, reaction_file, writer)
@@ -358,7 +361,7 @@ class DataReactions:
             self.k_b = np.array(raw_data[:, header.index("k_b")].astype(float))
             writer.message("Experimental kinetic rate constants processed.")
 
-        if parameters.chemical:
+        if parameters.thermochemical:
             Collector.column_exists("Ga", header, reaction_file, writer)
             self.ga = np.array(raw_data[:, header.index("Ga")].astype(float))
             if parameters.dg_reaction:
@@ -371,6 +374,34 @@ class DataReactions:
 
     @staticmethod
     def process_reaction(side, species_list):
+        """
+        Processes a chemical reaction side's string representation and parses the coefficients
+        and species in the reaction. Extracted species and their stoichiometric coefficients
+        are returned if all species are found in the provided list of known species.
+
+        This method is useful for analyzing and determining which species are involved in
+        a chemical reaction and their proportions based on the input reaction string.
+
+        Parameters
+        ----------
+        side : str
+            A string representing one side of a chemical reaction (e.g., '2 H2 + O2').
+        species_list : list of str
+            A list of valid species names allowed in the chemical reaction.
+
+        Returns
+        -------
+        tuple of (list of str, list of float)
+            A tuple containing two lists:
+            - The first list contains the species involved in the reaction as strings.
+            - The second list contains their respective stoichiometric coefficients as floats.
+
+        Raises
+        ------
+        ValueError
+            If a species in the reaction string is not present in the species_list or if the
+            format of the reaction string cannot be processed.
+        """
         species_in_reaction = []
         stoichiometric = []
         str = re.split(r"\s+", side)
@@ -394,17 +425,23 @@ class DataReactions:
 
 class Collector:
     """
-    Manages and processes data related to parameters, species, and reactions from specified directory.
+    Handles the collection and processing of data files for a project.
 
-    This class is designed to handle and manage data from files located in a given directory.
-    It initializes various data parameters, species, and reactions by reading from corresponding files.
+    This class serves as the main hub for initializing and managing various data
+    components required by the project. It instantiates submodules for handling
+    parameters, species, and reactions, while also orchestrating data processing
+    from associated files.
 
-    :ivar parameters: Instance handling data parameters from the parameters.md file.
-    :type parameters: DataParameters
-    :ivar species: Instance managing species information from the species.md file.
-    :type species: DataSpecies
-    :ivar reactions: Instance managing reaction data from the reactions.md file.
-    :type reactions: DataReactions
+    Attributes
+    ----------
+    directory : str
+        The root directory containing the data files and logs.
+    parameters : DataParameters
+        Manages the parameters extracted from a "parameters.md" file.
+    species : DataSpecies
+        Manages the species data extracted from a "species.md" file.
+    reactions : DataReactions
+        Manages the reactions data extracted from a "reactions.md" file.
     """
 
     def __init__(self, directory):
@@ -423,9 +460,33 @@ class Collector:
     @staticmethod
     def raw_data(name_file, writer):
         """
-        Processes raw data from a file with a specific format.
+        Retrieves raw data from a file formatted with a specific delimiter and structure.
 
-        The class contains methods to read and process data from a specified file.
+        This function reads a file containing data stored in a pipe-separated format. It extracts
+        the header from the first row of the file and the data entries starting from the third
+        row onwards, while skipping commented or empty lines. The header and data are returned
+        separately.
+
+        Parameters
+        ----------
+        name_file : str
+            The file path to be read. It should point to a pipe-separated file containing a
+            header and data entries.
+        writer : object
+            A writer object with a logger attribute capable of logging critical messages.
+            The logger is used to log issues related to file accessibility.
+
+        Returns
+        -------
+        tuple[list[str], numpy.ndarray]
+            A tuple containing:
+            - A list of strings representing the extracted header.
+            - A numpy array containing the raw data entries.
+
+        Raises
+        ------
+        FileNotFoundError
+            Raised if the specified file does not exist at the given file path.
         """
         if not os.path.exists(name_file):
             writer.logger.critical(f"ERROR File not found - {name_file}")
@@ -446,6 +507,31 @@ class Collector:
 
     @staticmethod
     def column_exists(column_name, header, file_name, writer):
+        """
+        Check if a specific column exists within a given header and log an error if it does not.
+
+        This method verifies whether a given column name is present in the provided header.
+        If the column is not found, it logs a critical error and raises a ValueError, indicating the absence of
+        the required column. The method is static and can be invoked without an instance of the class.
+
+        Parameters
+        ----------
+        column_name : str
+            The name of the column to check for in the header.
+        header : list
+            A list representing the header of the file, against which the column name is verified.
+        file_name : str
+            The name of the input file being validated. Used in error logging to specify the source of
+            the missing column.
+        writer : Any
+            A logger or writer object with a `logger.critical()` method for logging critical errors.
+
+        Raises
+        ------
+        ValueError
+            Raised when the required column is not found in the header of the input file.
+
+        """
         if column_name not in header:
             writer.logger.critical(f"ERROR Column 'DG_formation' not found in the {file_name} header.")
             raise ValueError(

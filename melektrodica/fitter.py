@@ -1,6 +1,6 @@
 """
 
-    μElektrodica © 2024
+    μElektrodica© 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -117,7 +117,7 @@ class Fitter(Calculator):
         try:
             ga, gf = self.unziper(energies)
             # Update Kpy with thermodynamic values
-            self.Kpy.thermodynamic_part = self.Kpy.thermodynamic(ga, gf, self.results.data.reactions.nua)
+            self.Kpy.thermochemical_part = self.Kpy.thermochemical(ga, gf, self.results.data.reactions.upsilon_a)
             self.results = self.strategy.solver()
             return self.results.j
 

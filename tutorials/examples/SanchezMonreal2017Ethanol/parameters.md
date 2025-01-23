@@ -16,7 +16,7 @@
 |                                 | kappa                        |     1 |       |
 |                                 | m                            |     1 |       |
 | Experimental                    | k_f, k_b                     |  True |       |
-| Chemical                        | Ga, DG_reaction              | False |       |
+| Thermochemical                  | Ga, DG_reaction              | False |       |
 |                                 | DG_reaction                  | False |       |
 |                                 | G_formation                  | False |       |
 

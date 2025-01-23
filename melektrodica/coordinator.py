@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    μElektrodica © 2024
+    μElektrodica© 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -43,7 +43,7 @@ class Coordinator:
         self.data = self.Kpy.data
 
     def plot_rxn_coords_potential(self, source, target, eta, fname):
-        self.upsilon = copy.deepcopy(self.data.reactions.nuc)
+        self.upsilon = copy.deepcopy(self.data.reactions.upsilon_c)
         self.species = copy.deepcopy(self.data.species.list)
         self.reactions = copy.deepcopy(self.data.reactions.list)
         self.grafo = self.stoichiometric_graphe(self.upsilon, self.species, self.reactions)

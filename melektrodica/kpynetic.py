@@ -1,6 +1,6 @@
 """
 
-    μElektrodica © 2024
+    μElektrodica© 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -23,14 +23,31 @@ from .constants import F, k_B, h
 
 class FreeEnergy:
     """
-    Provides static methods for calculating different types of free energy changes.
+    Represents a thermodynamic system to calculate free energy changes.
 
-    Detailed purpose includes calculations like reaction free energy, reduction reaction free energy,
-    and activation reaction free energy typically used in thermodynamics and electrochemistry contexts.
+    The FreeEnergy class provides a utility method to calculate
+    the Gibbs free energy change for a chemical reaction based on stoichiometric
+    coefficients and the Gibbs free energies of formation of the substances involved.
 
+    Attributes
+    ----------
+    data : objet
+        Placeholder for data storage related to the electrochemical system.
     """
 
     def __init__(self, data):
+        """
+        Represents a class designed to initialize and store data.
+
+        This class serves as a basic container for the input data. It allows the
+        data to be initialized during the creation of an object and accessed
+        via corresponding attributes.
+
+        Attributes
+        ----------
+        data : objet
+            The data provided during initialization.
+        """
         pass
 
     @staticmethod
@@ -38,9 +55,13 @@ class FreeEnergy:
         """
         Calculate the Gibbs free energy change for a reaction.
 
-        This method computes the negative of the dot product between the
-        vector of stoichiometric coefficients and the vector of Gibbs free
-        energies of formation for each substance involved in the reaction.
+        This method returns the reaction standard Gibbs free energy of the step reaction :math:`i` :cite:p:`SmithThermo`
+
+        .. math::
+
+            \\Delta G^\\circ_r = -\\sum_j \\upsilon_{ij} G_j^\\circ
+
+        where :math:`G_j^\\circ` is the standard Gibbs free formation energy of :math:`j` species
 
         :param upsilon: A vector of stoichiometric coefficients
                         representing the number of moles of each substance
@@ -60,13 +81,37 @@ class FreeEnergy:
 
 class RateConstants:
     """
-    A class used to calculate various rate constants for a chemical reaction system.
+    Class for performing calculations related to chemical kinetics and thermodynamic properties.
 
-    This class provides methods to compute general rate constants, experimental rate constants,
-    chemical reaction factors, and electronic parameters.
+    Kinetic rate constants, for an electrochemical system, can be determined experimentally or estimated
+    by thermodynamic and electrochemical parts, the forward, :math:`\\overrightarrow{k_i}`,
+    and backward, :math:`\\overleftarrow{k_i}`, rate constants :cite:p:`Exner2022`:
 
-    :ivar parameters: Parameters object containing temperature and other relevant properties.
-    :type parameters: object
+    .. math::
+
+       \\overrightarrow{k_i} = A \\underbrace{\\exp\\left(\\frac{- \\Delta G^{\\circ}_{a,i}} {k_BT} \\right)}_{\\textit{Thermodynamic}}
+        \\underbrace{\\exp\\left(\\frac{n_i\\beta_i\\eta} {k_BT} \\right)}_{\\textit{Electronic}}
+
+    .. math::
+
+        \\overleftarrow{k_i} = \\frac{\\overrightarrow{k_i}}{K_{eq,i}}=A
+        \\underbrace{\\exp\\left(\\frac{-\\Delta G^{\\circ}_{a,i} +
+            \\Delta G^\\circ_{r,i}}{k_BT} \\right)}_{\\textit{Thermodynamic}}
+        \\underbrace{\\exp\\left(\\frac{-n_i(1-\\beta_i)\\eta}{k_BT} \\right)}_{\\textit{Electronic}}
+
+
+    This class is designed to facilitate the computation of various constants and parameters
+    associated with chemical reactions. It uses data provided during initialization to access
+    attributes like temperature, reactions, and other necessary parameters.
+
+    Attributes
+    ----------
+    data : object
+        Data object containing parameters and reactions.
+    parameters : object
+        Parameters object extracted from the input data.
+    reactions : object
+        Reaction information extracted from the input data.
     """
 
     def __init__(self, data):
@@ -74,18 +119,30 @@ class RateConstants:
         self.parameters = data.parameters
         self.reactions = data.reactions
 
-    def constant(self, pre_exponential=1, experimental=1, chemical=0, electronic=0):
+    def constant(self, pre_exponential=1, experimental=1, thermochemical=0, electronic=0):
         """
-        Example class for demonstrating the calculation of a kinetics constant based on
-        provided parameters.
-        :param pre_exponential: Preexponential factor.
-        :param experimental: Experimental rate constant.
-        :param chemical: Chemical part of the rate constant.
-        :param electronic: electronic part of the rate constant.
-        :param parameters: Object with temperature attribute
-        :type parameters: Object
+        Calculates a reaction rate constants using the provided parameters.
+
+        This method computes the rate constant using the pre-exponential factor,
+        experimental factor, thermochemical and electronic contributions.
+
+        Parameters
+        ----------
+        pre_exponential : float, optional
+            The pre-exponential factor in the Arrhenius equation, often denoted as A.
+        experimental : float, optional
+            A multiplicative factor representing experimental data adjustments.
+        thermochemical : float, optional
+            The thermochemical contribution to the activation energy.
+        electronic : float, optional
+            The electronic contribution to the activation energy.
+
+        Returns
+        -------
+        float
+            The calculated reaction rate constant.
         """
-        self.argument = chemical + electronic
+        self.argument = thermochemical + electronic
         return (
                 pre_exponential
                 * experimental
@@ -95,35 +152,57 @@ class RateConstants:
     @staticmethod
     def experimental(forward_constants, backward_constants):
         """
-        Converts the forward and backward constants into a numpy array.
+        Construct an array combining forward and backward constants.
 
-        This function takes the provided forward and backward constants,
-        and combines them into a single numpy array. This is useful
-        for numerical computations where a unified data structure
-        for constants is needed.
+        The method compiles the given forward and backward constants into a
+        NumPy array. This array retains the provided constants in their
+        respective order for direct usage or subsequent computations.
 
-        :param forward_constants: Constants used in the forward computation
-        :type forward_constants: Any
-        :param backward_constants: Constants used in the backward computation
-        :type backward_constants: Any
-        :return: A numpy array combining forward and backward constants
-        :rtype: numpy.ndarray
+        Parameters
+        ----------
+        forward_constants : ndarray
+            Values to use as forward constants, of any data type appropriate
+            for inclusion in an array.
+        backward_constants : ndarray
+            Values to use as backward constants, of any data type appropriate
+            for inclusion in an array.
+
+        Returns
+        -------
+        numpy.ndarray
+            A NumPy array containing the provided forward constants and
+            backward constants, in the given order.
         """
         return np.array([forward_constants, backward_constants])
 
     @staticmethod
-    def thermodynamic(g_activation, g_formation, upsilon):
+    def thermochemical(g_activation, g_formation, upsilon):
         """
-        Compute the chemical energy.
+        Calculates the thermochemical free energies based on activation energy, formation
+        energy, and stoichiometric parameter.
 
-        This method calculates the chemical energy based on the activation
-        energy, change in the Gibbs free energy of the reaction, and the
-        number of electrons involved.
+        This static method computes the Gibbs free energy of the reaction using a given
+        stoichiometric coefficient and formation energy. It then returns an array containing
+        the activation energy and the sum of the activation energy and the Gibbs free energy
+        of the reaction.
 
-        :param g_activation: Activation energy.
-        :param dg_reaction: Change in Gibbs free energy of the reaction.
-        :return: Array containing the activation energy and the total chemical
-                 energy (activation energy plus change in Gibbs free energy).
+        Parameters
+        ----------
+        g_activation : float
+            The activation energy of the reaction in appropriate energy units.
+        g_formation : float
+            The Gibbs free energy of formation in appropriate energy units.
+        upsilon : float
+            The stoichiometric coefficient for the reaction, a dimensionless parameter.
+
+        Returns
+        -------
+        numpy.ndarray
+            A 1D array where:
+            - The first element is the activation energy (`g_activation`).
+            - The second element is the sum of the activation energy and the Gibbs free
+              energy of the reaction.
+
         """
         dg_reaction = FreeEnergy.reaction(upsilon, g_formation)
         return np.array([g_activation, g_activation + dg_reaction])
@@ -131,37 +210,58 @@ class RateConstants:
     @staticmethod
     def electronic(eta, ne, beta):
         """
-        Calculates the electronic field components based on the specified parameters.
+        Computes the electronic energy and its complementary component based on the input parameters.
 
-        The function utilizes the given eta, ne, and beta values to compute an array
-        that represents the electronic field. The resulting array contains two elements:
-        the first being the product of -ne, beta, and eta, and the second being the product
-        of ne, (1 - beta), and eta.
+        This function calculates the electronic energy and its complementary component
+        using the provided eta, ne, and beta parameters. It combines the number of
+        electrons (ne), a scaling factor (beta), and an energy term (eta) to compute
+        these values. The resulting array includes negative energy and complementary
+        part in specific proportions.
 
-        :param eta: The efficiency factor.
-        :type eta: float
-        :param ne: The charge density.
-        :type ne: float
-        :param beta: The proportionality constant.
-        :type beta: float
-        :return: An array representing the electronic field components.
-        :rtype: numpy.ndarray
+        Parameters
+        ----------
+        eta : float
+            Energy term used in the computation.
+        ne : int
+            Number of electrons involved in the computation.
+        beta : float
+            Scaling factor determining proportions of energy allocation.
+
+        Returns
+        -------
+        numpy.ndarray
+            A 1D array where the first element is the negative energy component,
+            and the second element is the complementary energy component.
         """
         return np.array([-ne * beta * eta, ne * (1 - beta) * eta])
 
 
 class ReactionRate:
     """
-    Computes the rate of a reaction based on various parameters.
+    Class to model reaction kinetics and catalysis.
 
-    The `ReactionRate` class calculates the reaction rate using the provided rate constants,
-    reactant and product concentrations, surface coverage, and reaction orders.
+    This class provides functionalities to calculate reaction rates based on
+    the law of mass action and power law kinetics. It is designed to handle
+    reaction rate constants, reactants and product concentrations, and
+    catalyst site occupancy to compute reaction mechanisms effectively.
 
-    :ivar species: Species involved in the reaction.
-    :type species: SomeSpeciesClass
+    .. math::
 
-    :ivar nu_catalyst: Stoichiometric coefficients for the catalyst.
-    :type nu_catalyst: np.ndarray
+          \\nu_i = \\overrightarrow{k_i}
+                    \\prod_{\\substack{j \\\\ \\upsilon_{ij}<0}} c_j ^{-\\upsilon_{ij}}
+                    \\prod_{\\substack{j \\\\ \\upsilon_{ij}<0}} \\theta_j ^{-\\upsilon_{ij}}
+                    -
+                    \\overleftarrow{k_i}
+                    \\prod_{\substack{j \\\\ \\upsilon_{ij}>0}} c_j ^{\\upsilon_{ij}}
+                    \\prod_{\substack{j \\\\ \\upsilon_{ij}>0}} \\theta_j ^{\\upsilon_{ij}}
+
+    Attributes
+    ----------
+    data : object
+        A data source containing information about the chemical system.
+    species : object
+        A property of the given data that includes catalyst species matrix or
+        related information.
     """
 
     def __init__(self, data):
@@ -170,19 +270,30 @@ class ReactionRate:
 
     def rate(self, k_rate, c_reactants, c_products, theta, upsilon):
         """
-        Calculate the reaction rate using given parameters.
+        Calculate the reaction rate for a given reaction system.
 
-        This method computes the rate of reaction based on the provided
-        rate constant, concentrations of reactants and products, a
-        parameter theta, and a power law exponent upsilon.
+        This method calculates the rate of reaction using the power-law
+        kinetics model. The reaction rate is determined by computing the
+        concentration of reactants and products based on system parameters,
+        applying the power-law formula and multiplying by the rate constant.
 
-        :param k_rate: The rate constant for the reaction.
-        :param c_reactants: The concentrations of the reactants.
-        :param c_products: The concentrations of the products.
-        :param theta: A parameter used to calculate concentrations.
-        :param upsilon: The exponent used in the power law for rate
-                        computation.
-        :return: The calculated reaction rate.
+        Parameters
+        ----------
+        k_rate : np.ndarray
+            The reaction rate constants for the chemical reactions.
+        c_reactants : np.ndarray
+            The concentration of the reactants involved in the reactions.
+        c_products : np.ndarray
+            The concentration of the products resulting from the reactions.
+        theta : np.ndarray
+            The set of system parameters governing reactant and product behaviors.
+        upsilon : np.ndarray
+            Stoichiometric coefficients dictating reactant-product relationships.
+
+        Returns
+        -------
+        np.ndarray
+            The computed reaction rate for each reaction across the system.
         """
         concentrations = self.concentrate(c_reactants, c_products, theta)
         rate = self.power_law(concentrations, upsilon)
@@ -190,52 +301,76 @@ class ReactionRate:
 
     def empty_sites(self, theta):
         """
-        Calculate and return the empty sites in the catalyst.
+        Computes the empty sites on a catalytic surface.
 
-        This function computes the empty sites in the catalyst by performing a matrix
-        multiplication between the catalyst species matrix (`nu_catalyst`) and the
-        input array `theta`, and then subtracting the result from 1.
+        The function calculates the empty sites on a catalytic surface based on the
+        provided theta vector, which represents the coverage of various species on the
+        surface. The species' contribution is determined by the nu_catalyst matrix,
+        which indicates the stoichiometric coefficients corresponding to the catalyst
+        interaction.
 
-        :param theta: Array representing the site occupancy mentioned in the
-          catalyst species matrix.
-        :type theta: np.ndarray
-        :return: Array representing the empty sites in the catalyst.
-        :rtype: np.ndarray
+        Parameters
+        ----------
+        theta : numpy.ndarray
+            A 1-dimensional array representing the coverage of the species on the
+            catalytic surface.
+
+        Returns
+        -------
+        numpy.ndarray
+            A 1-dimensional array showing the fraction of empty sites on the catalytic
+            surface.
         """
-        return np.array(1 - self.species.nu_catalyst @ theta)
+        return np.array(1 - self.species.ns_catalyst @ theta)
 
     def concentrate(self, c_reactants, c_products, theta):
         """
-        This method concatenates the concentrations of reactants, products, the given theta value,
-        and the result of `self.empty_sites()` method into a single numpy array.
+        Combine the concentrations of reactants, products, and other parameters into a single array.
 
-        :param c_reactants: Concentration vector for reactants.
-        :type c_reactants: np.ndarray
-        :param c_products: Concentration vector for products.
-        :type c_products: np.ndarray
-        :param theta: Theta value used for calculations.
-        :type theta: np.ndarray
-        :return: A concatenated numpy array containing all input concentrations and the result of
-                 the `self.emptysites()` method.
-        :rtype: np.ndarray
+        This method takes the concentrations of reactants and products, as well as a given
+        parameter `theta`, and combines them with the result from the `empty_sites` method.
+        The final output is a concatenated array that includes all these components.
+
+        Parameters
+        ----------
+        c_reactants : np.ndarray
+            Concentration array for reactants.
+        c_products : np.ndarray
+            Concentration array for products.
+        theta : np.ndarray
+            Array representing coverage or occupancy values.
+
+        Returns
+        -------
+        np.ndarray
+            A concatenated array containing the concentrations of reactants, products, the
+            provided `theta`, and the result of the `empty_sites` method.
         """
         return np.concatenate([c_reactants, c_products, theta, self.empty_sites(theta)])
 
     def power_law(self, concentration: ndarray, upsilon: ndarray) -> ndarray:
         """
-        Computes the power law of given concentrations with a specified upsilon value.
+        Calculates the power law product for two given parameters (concentration and upsilon).
 
-        This method calculates two arrays based on whether upsilon is negative or positive, raising
-        the concentration array to the power of upsilon and taking the product across the specified axis.
+        The method computes an array with two rows. The first row is the product of the
+        concentration raised to the power of the negative upsilon, conditioned by upsilon
+        being negative. The second row is the product of the concentration raised to the
+        power of the upsilon, conditioned by upsilon being positive.
 
-        :return:
-        :param concentration: Array of concentrations on which power law is computed
-        :type concentration: np.ndarray
-        :param upsilon: Exponent value used in the power law calculation
-        :type upsilon: float
+        Parameters
+        ----------
+        concentration : ndarray
+            A 2D array where each row corresponds to a set of concentration values.
+        upsilon : ndarray
+            A 2D array where each row corresponds to a set of upsilon values.
 
-        :return: Array containing the computed power law values
-        :rtype: np.ndarray
+        Returns
+        -------
+        ndarray
+            A 2D array where the first row corresponds to the computed power law products
+            of concentration and negative upsilon under specific conditions, and the second
+            row corresponds to the computed power law products of concentration and positive
+            upsilon under specific conditions.
         """
         return np.array(
             [
@@ -247,38 +382,107 @@ class ReactionRate:
 
 class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
     """
-    Kpynetic class for modeling and simulating kinetics of chemical reactions.
+    Represents a computational model for chemical kinetics and electrochemical dynamics.
 
-    This class integrates methods from FreeEnergy, RateConstants, and ReactionRate
-    to calculate reaction rates, current, and concentration changes over time. It
-    is designed to handle various parameters, including pre-exponential factors,
-    experimental rate constants, and chemical rate constants.
+    This class is designed to calculate the chemical kinetics and electrochemical behavior
+    of reactions by combining thermochemical, experimental, and electronic contributions.
+    It utilizes rate constants, free energy, and reaction parameters to compute reaction
+    rates, overpotentials, and currents. The purpose is to analyze and simulate reaction
+    mechanisms in various chemical and electrochemical systems.
 
-    :ivar data: Input data containing parameters, species, and reactions.
-    :type data: Data
-    :ivar parameters: Parameters for the reactions.
-    :type parameters: Parameters
-    :ivar species: Species involved in the reactions.
-    :type species: Species
-    :ivar reactions: Reaction information.
-    :type reactions: Reactions
-    :ivar electrode: Electrode potential sign, set based on parameters.
-    :type electrode: float
-    :ivar pre_exp: Pre-exponential factor, calculated based on transition state
-        theory (TST) or predefined value.
-    :type pre_exp: float
-    :ivar eK: Experimental rate constants array.
-    :type eK: np.ndarray
-    :ivar qK: Chemical rate constants array.
-    :type qK: np.ndarray
-    :ivar Ga: Gibbs free energy of activation, set if parameters.chemical is True.
-    :type Ga: np.ndarray or None
-    :ivar DG_reaction: Gibbs free energy change of reaction, set if parameters.chemical
-        is True.
-    :type DG_reaction: np.ndarray or None
+    Attributes
+    ----------
+    writer : Writer
+        Object used for logging and managing output messages.
+    data : copy.deepcopy
+        Deep copy of the input data for initializing the model.
+    parameters : dict
+        Reaction parameters extracted from the input data.
+    species : list
+        List of species involved in the reactions.
+    reactions : object
+        Reactions data including forward and backward reaction rates.
+    operation : dict
+        Operational parameters derived from input data.
+    electrode : float
+        Factor to determine the nature of the electrode (e.g., anode or cathode).
+    pre_exp : float
+        Pre-exponential factor used in rate calculations.
+    experimental_part : np.ndarray
+        Contributions of experimental factors to the reaction rates.
+    thermochemical_part : np.ndarray
+        Contributions of thermochemical factors to the reaction rates.
+    g_activation : list or None
+        Activation free energy values for the reactions.
+    g_formation : list or None
+        Formation free energy values for the adsorbed species.
+    dg_reaction : list
+        Reaction free energy changes computed from stoichiometry.
+    electronic_part : float or None
+        Electronic contribution to rate constants.
+    constant : callable
+        Method for evaluating the overall rate constant.
+    rate : callable
+        Method for computing reaction rates.
+    v : np.ndarray or None
+        Reaction rates computed during runtime.
     """
 
     def __init__(self, data):
+        """
+        Initializes the kinetic model object for reaction simulation based on given data.
+
+        This class is responsible for initializing and setting up various reaction-based
+        parameters and constants required for kinetic simulations. The parameters include
+        pre-exponential factors, electrode properties, experimental reaction constants, and
+        thermodynamic data. These values are derived either directly from the input data or
+        calculated based on the provided configurations.
+
+        Parameters
+        ----------
+        data : object
+            The data object containing parameters, species, and reactions information
+            required for initializing the kinetic model.
+
+        Attributes
+        ----------
+        writer : Writer
+            A writer instance used for logging messages.
+        data : object
+            A deep copy of the input data object.
+        k_rate : None or float
+            The kinetic rate, to be calculated or initialized later.
+        electronic_part : None or float
+            A placeholder for electronic contribution, to be set later.
+        parameters : object
+            The parameters from the input data object, used to configure
+            properties of the kinetic model.
+        species : object
+            The species information from the input data object.
+        reactions : object
+            The reactions information from the input data object.
+        operation : object
+            A reference to the parameters for operations.
+        electrode : float
+            The electrode property, set to 1.0 for cathode or -1.0 for anode
+            based on the input data.
+        pre_exp : float
+            The pre-exponential factor for rate constants, calculated based
+            on the input data.
+        experimental_part : numpy.ndarray
+            A 2D array containing experimental rate constants for both
+            forward and backward reactions, defaulted to ones if no experimental data is provided.
+        thermochemical_part : numpy.ndarray
+            A 2D array containing thermodynamic contributions to forward
+            and backward reaction constants, initialized to zeros if no thermodynamic
+            configurations are available.
+        g_activation : numpy.ndarray or None
+            Free energy of activation for reactions, calculated if thermochemical data is used.
+        g_formation : numpy.ndarray or None
+            Free energy of formation for adsorbed species, derived if thermochemical data is used.
+        dg_reaction : numpy.ndarray or None
+            Free energy of reaction, derived from thermodynamic contributions if configured.
+        """
         self.writer = Writer()
         self.writer.message(f"*** Kpynetic :  ***")
         self.data = copy.deepcopy(data)
@@ -315,19 +519,49 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             )
 
         # Thermodynamic
-        self.thermodynamic_part = np.zeros((2, len(self.reactions.list)))
-        if self.parameters.chemical:
+        self.thermochemical_part = np.zeros((2, len(self.reactions.list)))
+        if self.parameters.thermochemical:
             self.g_activation = self.reactions.ga
             self.g_formation = self.species.g_formation_ads
-            self.dg_reaction = FreeEnergy.reaction(self.reactions.nua, self.g_formation)
-            self.thermodynamic_part = RateConstants.thermodynamic(
-                self.g_activation, self.g_formation, self.reactions.nua
+            self.dg_reaction = FreeEnergy.reaction(self.reactions.upsilon_a, self.g_formation)
+            self.thermochemical_part = RateConstants.thermochemical(
+                self.g_activation, self.g_formation, self.reactions.upsilon_a
             )
             #if self.parameters.dg_reaction:
             #    self.dg_reaction = self.reactions.dg_reaction
             #elif self.parameters.g_formation:
 
     def foverpotential(self, potential, c_reactants, c_products, theta):
+        """
+        Calculate the overpotential and reaction rate within an electrochemical system.
+
+        This function computes the overpotential and reaction rate for a given
+        electrochemical reaction, based on the provided potential, concentrations
+        of reactants and products, and surface coverage. Overpotential is calculated
+        based on the electrode potential and reaction-specific parameters, including
+        number of electrons transferred and symmetry factor. The reaction rate is
+        determined using a combination of rate constants accounting for thermochemical,
+        electronic, and experimental contributions.
+
+        Parameters
+        ----------
+        potential : float
+            The applied potential of the electrode.
+        c_reactants : float
+            The concentration of reactants in the system.
+        c_products : float
+            The concentration of products in the system.
+        theta : float
+            Surface coverage of the reaction intermediate.
+
+        Notes
+        -----
+        The calculated overpotential `eta` is used in determining the
+        electronic component of the reaction rate constant. This constant,
+        along with the pre-exponential and experimental parts, is combined
+        to compute the full rate constant. The rate constant is then used
+        to determine the overall reaction rate `v`.
+        """
         eta = potential
         self.electronic_part = self.electrode * RateConstants.electronic(
             eta, self.reactions.ne, self.reactions.beta
@@ -335,26 +569,90 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         self.k_rate = self.constant(
             pre_exponential=self.pre_exp,
             experimental=self.experimental_part,
-            chemical=self.thermodynamic_part,
+            thermochemical=self.thermochemical_part,
             electronic=self.electronic_part,
         )
         self.v = self.rate(
-            self.k_rate, c_reactants, c_products, theta, self.reactions.nu
+            self.k_rate, c_reactants, c_products, theta, self.reactions.upsilon
         )
 
     def get_argument(self, potential):
+        """
+        Calculates and assigns the electronic part using the specified potential and reactions'
+        parameters. Then computes and sets the necessary constant components required for
+        further calculations. Finally, returns the calculated argument.
+
+        Parameters
+        ----------
+        potential : float
+            The potential value used to calculate the electronic part based on the
+            electrode, number of electrons in the reaction, and the beta parameter.
+
+        Returns
+        -------
+        float
+            The computed argument based on the calculated electronic and other pre-defined
+            constant components.
+        """
         self.electronic_part = self.electrode * RateConstants.electronic(
             potential, self.reactions.ne, self.reactions.beta
         )
         self.constant(pre_exponential=1, experimental=1,
-                      chemical=self.thermodynamic_part,
+                      thermochemical=self.thermochemical_part,
                       electronic=self.electronic_part,
                       )
         return self.argument
 
     def current(self, potential, c_reactants, c_products, theta):
+        """
+        Calculates the electric current for the given system based on the provided input parameters.
+
+        This method models the relationship between the potential, concentrations of reactants and
+        products, and other factors to compute the net current. The computation utilizes the
+        overpotential and reaction mechanisms to derive the output.
+
+        Parameters
+        ----------
+        potential : float
+            The electrical potential in volts influencing the reaction.
+
+        c_reactants : numpy.ndarray
+            Concentrations of reactant species, represented as an array of values.
+
+        c_products : numpy.ndarray
+            Concentrations of product species, represented as an array of values.
+
+        theta : float
+            Surface coverage or activity parameter related to the reaction kinetics.
+
+        Returns
+        -------
+        float
+            The total electric current resulting from the electrochemical reactions.
+        """
         self.foverpotential(potential, c_reactants, c_products, theta)
         return np.dot(self.reactions.ne, self.v) * F
 
     def dcdt(self, rate, upsilon: np.ndarray) -> np.ndarray:
+        """
+        Computes the dot product of a given rate and upsilon values.
+
+        This method calculates the dot product of a rate value with an array
+        of upsilon values using the numpy dot function. It is designed to
+        return a numpy array representing the result of the computation.
+
+        Parameters
+        ----------
+        rate : float
+            A numerical value that represents the rate for the computation.
+        upsilon : np.ndarray
+            A numpy array containing the upsilon values to be used in the dot
+            product computation.
+
+        Returns
+        -------
+        np.ndarray
+            A numpy array containing the result of the dot product computation.
+
+        """
         return np.dot(rate, upsilon)

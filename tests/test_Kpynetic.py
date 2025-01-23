@@ -1,6 +1,6 @@
 """
 
-    μElektrodica © 2024
+    μElektrodica© 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -87,7 +87,7 @@ class TestRateConstants(unittest.TestCase):
         self.data = self
         self.data.parameters = self
         self.data.reactions = self
-        self.RateConstants= RateConstants(self.data)
+        self.RateConstants = RateConstants(self.data)
 
     def test_constant(self):
         class Parameters:
@@ -98,16 +98,16 @@ class TestRateConstants(unittest.TestCase):
 
         pre_exponential = 2
         experimental = 2
-        chemical = 10
+        thermochemical = 10
         electronic = 5
         expected_result = (
                 pre_exponential
                 * experimental
-                * np.exp(-(chemical + electronic) / (8.617333262145e-5) / 300)
+                * np.exp(-(thermochemical + electronic) / (8.617333262145e-5) / 300)
         )
 
         result = self.RateConstants.constant(
-            pre_exponential, experimental, chemical, electronic
+            pre_exponential, experimental, thermochemical, electronic
         )
         self.assertAlmostEqual(result, expected_result, places=6)
 
@@ -118,12 +118,12 @@ class TestRateConstants(unittest.TestCase):
         result = self.RateConstants.experimental(forward_constants, backward_constants)
         np.testing.assert_array_equal(result, expected_result)
 
-    def test_thermodynamic(self):
+    def test_thermochemical(self):
         G_formation = np.array([100])
         G_activation = np.array([80])
         upsilon = np.array([1.0])
-        expected_result = np.array([G_activation, G_activation -(upsilon @ G_formation)])
-        result = self.RateConstants.thermodynamic(G_activation, G_activation, upsilon)
+        expected_result = np.array([G_activation, G_activation - (upsilon @ G_formation)])
+        result = self.RateConstants.thermochemical(G_activation, G_activation, upsilon)
         print(expected_result, result)
         np.testing.assert_array_equal(result, expected_result)
 
@@ -209,7 +209,7 @@ class TestKpynetic(unittest.TestCase):
         T = 300
         m = 1.0
         experimental = False
-        chemical = False
+        thermochemical = False
         DG_reaction = False
         G_formation = False
         potential = 0.0
@@ -219,7 +219,7 @@ class TestKpynetic(unittest.TestCase):
 
     class Reactions:
         list = []
-        nua = np.array([1.0])
+        upsilon_a = np.array([1.0])
         ne = np.array([1.0])
         beta = np.array([1.0])
         nu = np.array([-1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0])

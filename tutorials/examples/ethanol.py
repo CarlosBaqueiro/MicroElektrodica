@@ -33,7 +33,7 @@ class Ethanol:
         self.Kpy = Kpynetic(self.data)
         self.melek = Calculator(self.Kpy, 'melek')
 
-        writer.markdown('ethanol', 'theta', self.melek )
+        writer.markdown('ethanol', 'theta', self.melek)
 
         # CSTR mode
         self.data_cstr = copy.deepcopy(self.data)
@@ -43,8 +43,6 @@ class Ethanol:
         self.data_cstr.parameters.Ac = 1
         self.Kpy_cstr = Kpynetic(self.data_cstr)
         self.melek_cstr = Calculator(self.Kpy_cstr, 'cstr')
-
-
 
         ch3choh = np.array(
             [

@@ -54,7 +54,7 @@ A peer-reviewed article is currently in progress. Stay tuned for the DOI!
 
 ## Copyright and License
 
-Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+Copyright (C) 2025 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
 μElektrodica is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. See
 license file for more information.
 

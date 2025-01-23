@@ -1,6 +1,6 @@
 """
 
-    μElektrodica © 2024
+    μElektrodica© 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -9,6 +9,7 @@
 """
 
 import shutil
+
 
 class Tool:
     @staticmethod

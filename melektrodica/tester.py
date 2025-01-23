@@ -1,6 +1,6 @@
 """
 
-    μElektrodica © 2024
+    μElektrodica© 2025
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
@@ -36,8 +36,8 @@ class Tester:
 
     def print_coefficients(self, data):
         print(f"\nCOEFFICIENTS: \n")
-        print(f"All coefficients, len {len(data.nu)}: \n {data.nu} \n")
-        print(f"Species coefficients, len {len(data.nux)}: \n {data.nux} \n")
+        print(f"All coefficients, len {len(data.upsilon)}: \n {data.upsilon} \n")
+        print(f"Species coefficients, len {len(data.upsilonx)}: \n {data.upsilonx} \n")
         print(f"Electrons number, len {len(data.ne)}: \n {data.ne} \n")
 
     def print_energies(selfself, data):
