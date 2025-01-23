@@ -289,6 +289,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         self.parameters = data.parameters
         self.species = data.species
         self.reactions = data.reactions
+        self.operation = data.parameters
 
         self.electrode = 1.0
         if not self.parameters.anode:

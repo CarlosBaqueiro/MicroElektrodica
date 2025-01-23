@@ -58,3 +58,9 @@ class Tool:
                     formatted += char
             chemicals.append(f"$\\mathrm{{{formatted}}}$")  # Agregar delimitadores de LaTeX
         return chemicals
+
+    @staticmethod
+    def show_file(fname):
+        with open(fname, "r") as f:
+            file = f.read()
+        return file
