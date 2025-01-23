@@ -1,4 +1,4 @@
-Writer Module
+Tools Module
 =============
 .. automodule:: melektrodica.tools
    :members:

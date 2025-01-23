@@ -6,7 +6,7 @@
         by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
         is licensed under CC BY-NC-SA 4.0
 
-        Calculator class
+        Coordinator class
 
 """
 

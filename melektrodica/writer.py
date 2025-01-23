@@ -1,3 +1,13 @@
+"""
+
+    μElektrodica© 2025
+        by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        is licensed under CC BY-NC-SA 4.0
+
+        Writer class
+
+"""
+
 import os
 import csv
 import logging
