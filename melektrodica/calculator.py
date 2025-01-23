@@ -26,25 +26,86 @@ from .writer import Writer
 
 class BaseConcentration:
     """
-    Represents a base class for concentration calculations in a chemical system.
+    Manages the initialization and storage of chemical reaction model data.
 
-    This class is designed to perform concentration and related state variable
-    calculations for a given system defined by the parameters, species, and
-    reactions.
+    This class is designed to initialize and organize key parameters and
+    data for simulation or analysis of chemical reaction models. It sets
+    up critical attributes such as operation parameters, potential, species,
+    and reactions, while also providing placeholders for computed values.
 
-    :ivar data: Data containing parameters, species, and reactions of the system.
-    :ivar operation: Parameters related to the operation of the system.
-    :ivar species: Species involved in the chemical reactions.
-    :ivar reactions: Reactions occurring in the system.
-    :ivar Kpy: Object containing specific methods for kinetic and potential calculations.
-    :ivar c_reactants: Concentrations of reactants.
-    :ivar c_products: Concentrations of products.
-    :ivar theta: Coverages of adsorbed species.
-    :ivar j: Array for current density calculations.
-    :ivar fval: Array for function values from steady-state equations.
+    Attributes
+    ----------
+    Kpy : object
+        The reference to the input `kpy` object provided during initialization.
+    data : object
+        The data attribute of `kpy`, containing necessary information for
+        reaction modeling.
+    operation : object
+        A sub-attribute of `data`, representing the operational parameters.
+    potential : object
+        Extracted from `operation`, represents the chemical or model potential.
+    species : object
+        Extracted from `data`, contains the chemical species present in the model.
+    reactions : object
+        Extracted from `data`, representing the set of reactions in the chemical
+        model.
+    c_reactants : None or other
+        Placeholder for computed reactant concentrations.
+    c_products : None or other
+        Placeholder for computed product concentrations.
+    theta : None or other
+        Placeholder for a computed parameter (e.g., coverage fraction).
+    j : None or other
+        Placeholder for computed current density or rate parameter.
+    fval : None or other
+        Placeholder for a computed function value during calculations
+        (e.g., objective function value).
     """
 
     def __init__(self, kpy):
+        """
+        Manages the initialization and storage of chemical reaction model data.
+
+        This class is designed to initialize and organize key parameters and data
+        for simulation or analysis of chemical reaction models. It sets up critical
+        attributes such as operation parameters, potential, species, and reactions,
+        while also providing placeholders for computed values.
+
+        Parameters
+        ----------
+        kpy : object
+            The input object from which the chemical reaction data and parameters
+            are extracted. This must contain `data` with `parameters`, `potential`,
+            `species`, and `reactions` attributes.
+
+        Attributes
+        ----------
+        Kpy : object
+            The reference to the input `kpy` object provided during initialization.
+        data : object
+            The data attribute of `kpy`, containing necessary information for reaction
+            modeling.
+        operation : object
+            A sub-attribute of `data`, representing the operational parameters.
+        potential : object
+            Extracted from `operation`, represents the chemical or model potential.
+        species : object
+            Extracted from `data`, contains the chemical species present in the model.
+        reactions : object
+            Extracted from `data`, representing the set of reactions in the chemical
+            model.
+        c_reactants : None or other
+            Placeholder for computed reactant concentrations.
+        c_products : None or other
+            Placeholder for computed product concentrations.
+        theta : None or other
+            Placeholder for a computed parameter (e.g., coverage fraction).
+        j : None or other
+            Placeholder for computed current density or rate parameter.
+        fval : None or other
+            Placeholder for a computed function value during calculations (e.g.,
+            objective function value).
+        """
         self.Kpy = kpy
         self.data = self.Kpy.data
         self.operation = self.data.parameters
@@ -60,15 +121,25 @@ class BaseConcentration:
 
     def solver(self):
         """
-        Solves the steady-state equations for a series of potentials and updates the concentrations of reactants,
-        products, and adsorbed species, as well as the reaction current and function values.
+            solver(self)
 
-        The method iterates over the potentials in the operation and uses a nonlinear solver `fsolve` to find the
-        steady-state solution. It then updates the corresponding attributes with the calculated values.
+            Solves a system of equations for steady-state reaction kinetics and computes
+            reactant, product, and adsorbed species concentrations as well as the
+            current density for a range of applied potentials. The method utilizes
+            numerical root-finding techniques to achieve steady-state solutions.
 
-        :return: Updated instance of the caller object with calculated values.
-        :rtype: self
+            During the solving process, runtime warnings are captured and logged for
+            debugging purposes. If convergence issues occur, an exception is raised
+            for the specific potential value.
+
+            Returns
+            -------
+            self : object
+                The instance of the class with updated attributes for steady-state
+                reactant, product, adsorbed species concentrations, computed current
+                densities, and other intermediate results.
         """
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
 
@@ -103,14 +174,12 @@ class BaseConcentration:
 
     def initialize(self):
         """
-        BaseClass serves as an abstract base class which requires subclasses
-        to implement the `initialize` method. This class is designed to be
-        inherited by other classes that provide specific implementations of
-        initialization procedures.
-
-        :raises NotImplementedError: when the `initialize` method is called
-            on an instance of the BaseClass or any subclass that has not
-            overridden this method.
+        Raises
+        ------
+        NotImplementedError
+            This exception is raised when the method `initialize` is not implemented
+            by a subclass. Subclasses inheriting this method must override and
+            implement their own logic.
         """
         raise NotImplementedError(
             "The method initialize must be implemented by the subclass"
@@ -118,13 +187,23 @@ class BaseConcentration:
 
     def unzip_variables(self, variables):
         """
-        Unzips a list of variables. Each subclass must implement this method
-        to provide specific functionality for unzipping.
+        Unzips a collection of variable pairs into two separate lists.
 
-        :param variables: A list of variables to be unzipped.
-        :type variables: list
-        :raises NotImplementedError: If the method is not implemented by the subclass.
-        :return: None
+        This method is intended to be overridden by subclasses to provide the specific
+        implementation for unzipping the given variables. It takes a collection of
+        paired variables and separates them into two distinct lists or structures.
+
+        Parameters
+        ----------
+        variables : list of tuple
+            A collection of paired variables, where each pair is represented as a tuple.
+            The method expects the input to be iterable.
+
+        Raises
+        ------
+        NotImplementedError
+            If this method is not overridden by a subclass and is called directly,
+            this exception is raised to indicate that the implementation is missing.
         """
         raise NotImplementedError(
             "The method unzip_variables must be implemented by the subclass"
@@ -132,21 +211,28 @@ class BaseConcentration:
 
     def right_hand_side(self, c_reactants, c_products, theta):
         """
-        Compute the right-hand side of the reaction rate equation.
+        Computes the right-hand side of a system of ordinary differential equations (ODEs).
 
-        This method calculates the right-hand side of the reaction rate equation given the
-        concentrations of reactants and products, and a set of parameters.
+        This method calculates the derivative of concentrations with respect to time, using
+        the provided reactant concentrations, product concentrations, and kinetic parameters.
+        The actual implementation must be provided in a subclass by overriding this method.
 
-        :param c_reactants: Concentration of reactants.
-        :type c_reactants: float
-        :param c_products: Concentration of products.
-        :type c_products: float
-        :param theta: A parameter vector that may include rate constants and other
-            kinetic parameters.
-        :type theta: list[float]
+        Parameters
+        ----------
+        c_reactants : Any
+            The concentrations of the reactants in the system. The specific data type and
+            structure depend on the implementation and the problem being modeled.
+        c_products : Any
+            The concentrations of the products in the system. The specific data type and
+            structure depend on the implementation and the problem being modeled.
+        theta : Any
+            The vector or parameters representing the kinetic coefficients or other
+            parameters necessary for computing the reaction rates.
 
-        :return: Rate of change for reactants and products.
-        :rtype: float
+        Raises
+        ------
+        NotImplementedError
+            If the method is not overridden in a subclass.
         """
         raise NotImplementedError(
             "The method unzip_variables must be implemented by the subclass"
@@ -154,28 +240,29 @@ class BaseConcentration:
 
     def steady_state(self, variables, potential):
         """
-        Calculates the steady-state concentration changes for reactants
-        and products based on the given variables and potential.
+        Computes the steady-state properties of a reaction system given the input variables and
+        potential. This function evaluates the reaction dynamics by decomposing the input
+        variables, computing the right-hand side (RHS) of the reaction system, evaluating the
+        overpotential, and determining the change in concentrations and other state properties.
 
-        The method unwraps the variables into reactant concentrations,
-        product concentrations, and an additional parameter theta. It then
-        computes the right-hand side (rhs) of the equations using these
-        concentrations. The potential function is updated with the
-        concentrations and potential. Finally, it calculates the rate
-        change of concentrations and returns the difference between this
-        rate and the rhs value.
+        Parameters
+        ----------
+        variables : Any
+            A set of state variables for the reaction system, which include the concentrations
+            of reactants, products, and the state variable `theta`.
 
-        :param variables: List containing concentrations for reactants,
-                          products and an additional parameter theta
-                          in the order [c_reactants, c_products, theta].
-        :type variables: list of float
-        :param potential: A potential value affecting the concentration
-                          changes.
-        :type potential: float
-        :return: Difference between the rate change of concentrations
-                 and the rhs value.
-        :rtype: float
+        potential : Any
+            The potential applied to the reaction system which is utilized for calculating the
+            overpotential.
+
+        Returns
+        -------
+        Any
+            The computed rate of change (`dcdt`) for the concentrations and other reaction
+            variables, determined by subtracting the right-hand side from the calculated rate
+            expressions.
         """
+
         c_reactants, c_products, theta = self.unzip_variables(variables)
         rhs = self.right_hand_side(c_reactants, c_products, theta)
         self.Kpy.foverpotential(potential, c_reactants, c_products, theta)
@@ -183,19 +270,28 @@ class BaseConcentration:
 
     def current(self, variables, potential):
         """
-        Calculates the current based on the given variables and potential.
+        Calculates the current for a given set of variables and potential using
+        an underlying kinetic model.
 
-        This function utilizes the reaction-related concentrations and parameter
-        theta from the extracted variables to compute the current by delegating
-        the computation to the Kpy object.
+        This function extracts the necessary parameters from the input variables
+        and processes the potential and concentrations of reactants and products.
+        The current is then computed using a predefined kinetic model instance.
 
-        :param variables: A sequence containing concentrations of reactants,
-            concentrations of products, and the parameter theta.
-        :type variables: Sequence
-        :param potential: The electric potential at which the current is calculated.
-        :type potential: float
-        :return: The calculated current.
-        :rtype: float
+        Parameters
+        ----------
+        variables : Any
+            The variables containing information about reactant concentrations,
+            product concentrations, and additional parameters required for
+            current calculation.
+        potential : Any
+            The potential at which the current is to be calculated. This is a key
+            input for the kinetic model.
+
+        Returns
+        -------
+        Any
+            The calculated current value based on the provided potential and
+            extracted variables.
         """
         c_reactants, c_products, theta = self.unzip_variables(variables)
         return self.Kpy.current(potential, c_reactants, c_products, theta)
@@ -203,35 +299,42 @@ class BaseConcentration:
 
 class StaticConcentration(BaseConcentration):
     """
-    Represents a static concentration model within a reaction system.
+    Simulates the static concentration within a computational model.
 
-    This class initializes the concentrations of species within a reactive
-    system and handles variables associated with the reaction process.
-    It provides methods to initialize the system, unpack variables used in
-    the reaction, and calculate the rate change of the system.
+    This class is designed to handle the initialization, transformation,
+    and computation of parameters and variables in modeling adsorption
+    species and their interactions with potentials. It includes methods
+    to set up the initial state of the system, extract variables into
+    reactants and products, and compute specific reaction rate equations.
 
-    :ivar species: Contains the species involved in the reaction.
-    :type species: Species
-    :ivar operation: Holds operational parameters for the reaction.
-    :type operation: Operation
+    Attributes
+    ----------
+    species : Species
+        Contains details related to adsorbed species, including initial
+        concentrations.
+    operation : Operation
+        Represents the specific potentials and operational dimensions
+        involved in the computation process.
     """
 
     def initialize(self):
         """
-        Initializes the values for subsequent calculations.
+        initialize(self)
 
-        This method initializes two arrays needed for further computation:
-        - `fval`: A 2D array based on the length of `self.operation.potential`
-          and `self.species.adsorbed`.
-        - `initio`: A 1D concatenated array created from `theta0`.
+        Initializes and sets up the necessary initial state for a simulation or computation
+        process involving adsorption species and potential operations. Specifically, this
+        method creates zero matrices and vectors based on the dimensions of the adsorption
+        species and the potentials involved, preparing for the subsequent computations.
 
         Returns
         -------
-        tuple of ndarray
-            A tuple containing two NumPy arrays:
-            - `fval`: A 2D array of zeros with dimensions
-              (len(self.operation.potential), len(self.species.adsorbed)).
-            - `initio`: A 1D array created by concatenating the `theta0` array.
+        tuple of (ndarray, ndarray)
+            A tuple containing:
+            - fval : ndarray
+                A 2D array of zeros with shape corresponding to the number of potentials
+                and the number of adsorbed species.
+            - initio : ndarray
+                A 1D array of zeros concatenated from adsorption species initial states.
         """
 
         fval = np.zeros((len(self.operation.potential), len(self.species.adsorbed)))
@@ -241,15 +344,26 @@ class StaticConcentration(BaseConcentration):
 
     def unzip_variables(self, variables):
         """
-        Unzips the provided variables and returns initial concentrations for reactants, products,
-        and theta value from the species.
+        Extracts the initial concentrations for reactants and products along with a variable, theta.
 
-        :param variables: The variables to unzip.
-        :type variables: any
+        This function unpacks a set of variables into its corresponding initial concentrations
+        for reactants and products, and a specific variable referred to as theta. These
+        concentrations are determined using the associated species attributes of the object.
 
-        :return: A tuple containing the initial concentrations of reactants, initial concentrations of
-                 products, and theta value.
-        :rtype: tuple
+        Parameters
+        ----------
+        variables : Any
+            A variable or set of variables that contains the necessary components
+            to unpack into `theta`.
+
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - c_reactants: The initial concentrations for reactants.
+            - c_products: The initial concentrations for products.
+            - theta: The unpacked variable from the input variables.
+
         """
 
         c_reactants = self.species.c0_reactants
@@ -259,49 +373,69 @@ class StaticConcentration(BaseConcentration):
 
     def right_hand_side(self, c_reactants, c_products, theta):
         """
-        Compute the right-hand side of the reaction rate equation.
+        Computes the right-hand side of a system of equations describing reaction dynamics.
 
-        This method calculates the right-hand side of the reaction rate equation given the
-        concentrations of reactants and products, and a set of parameters.
+        This method evaluates the rate equations for chemical reactions, which describe
+        changes in concentrations of reactants and products over time based on reaction
+        constants and reaction conditions. It returns the computed values of the system's
+        right-hand side at a given state.
 
-        :param c_reactants: Concentrations of the reactants
-        :type c_reactants: numpy.ndarray
-        :param c_products: Concentrations of the products
-        :type c_products: numpy.ndarray
-        :param theta: Parameters of the reaction rate equation
-        :type theta: numpy.ndarray
-        :return: An array of zeros with the same length as the number of parameters in theta
-        :rtype: numpy.ndarray
+        Parameters
+        ----------
+        c_reactants : np.ndarray
+            Array of concentrations of reactant species.
+        c_products : np.ndarray
+            Array of concentrations of product species.
+        theta : np.ndarray
+            Array of parameters (e.g., rate constants) for the reactions.
+
+        Returns
+        -------
+        np.ndarray
+            Array of evaluated right-hand side values corresponding to each reaction.
         """
         return np.zeros(len(theta))
 
 
 class DynamicConcentration(BaseConcentration):
     """
-    Handles dynamic concentration calculations for chemical species in a system.
+    Handles dynamic concentration calculations for chemical species during simulations.
 
-    This class is responsible for initializing concentrations of reactants, products,
-    and adsorbed species, and for unzipping and calculating the right-hand side of the
-    differential equations governing the system.
+    This class is designed to model and compute the dynamic concentrations of reactants,
+    products, and adsorbed species. It provides methods for initializing simulation conditions,
+    unpacking concentration arrays, and computing the right-hand side of the governing
+    differential equations for the modeled system.
 
-    :ivar operation: Operation parameters containing information about potential, flow rate,
-                     and cross-sectional area.
-    :type operation: OperationParameters
-    :ivar species: Species-related parameters including initial concentrations of reactants,
-                   products, and adsorbed species.
-    :type species: SpeciesParameters
+    Attributes
+    ----------
+    species : object
+        Object containing information about reactants, products, and adsorbed species. It
+        should provide attributes like `reactants`, `products`, `adsorbed`, `c0_reactants`,
+        and `c0_products`.
+    operation : object
+        Object containing operational parameters such as potential, fluid velocity (`Fv`),
+        and cross-sectional area (`Ac`), which are used for system calculations.
     """
 
     def initialize(self):
         """
-        Initializes the system by setting initial values for reactants, products, and adsorbed species.
+        Initializes and returns the state variables and a matrix of zeros for further computational
+        operations within a chemical kinetic simulation. This function primarily prepares
+        initial concentrations for reactants, products, and adsorbed species, and a zero-initialized
+        matrix associated with potential data and species being modeled.
 
-        This function creates initial concentrations and initializes conditions for numerical
-        simulations by setting up arrays of zeros and ones based on the lengths of reactants,
-        products, and adsorbed species provided by the `species` attribute of the class instance.
+        Returns
+        -------
+        fval : numpy.ndarray
+            A zero-initialized matrix with dimensions corresponding to the number of
+            potential values in the `operation.potential` attribute across the
+            summed count of reactant, product, and adsorbed species in the `species`
+            attribute.
 
-        :return: A tuple containing the initial condition vectors.
-        :rtype: tuple(np.ndarray, np.ndarray)
+        initio : numpy.ndarray
+            An array containing the concatenated initial concentration values for
+            reactants (set to ones), products (set to zeros), and adsorbed species
+            (set to zeros).
         """
 
         fval = np.zeros(
@@ -320,15 +454,33 @@ class DynamicConcentration(BaseConcentration):
 
     def unzip_variables(self, variables):
         """
-        Unzips a list of variables into reactants, products, and adsorbed species
-        concentrations.
+        Unzips a list of variables into separate components representing reactants,
+        products, and adsorbed species concentrations.
 
-        :param variables: List of variables to unzip. The list is expected to be ordered such that
-                          reactants are followed by products and then adsorbed species.
-        :type variables: list
-        :return: Tuple containing the concentrations of reactants, products, and adsorbed species.
-        :rtype: tuple
+        The method splits the input `variables` array into three distinct components:
+        concentrations of reactants (`c_reactants`), concentrations of products
+        (`c_products`), and the fractional surface coverage of adsorbed species
+        (`theta`). The split is determined by the number of species categorized into
+        reactants, products, and adsorbed species within the `self.species` object.
+
+        Parameters
+        ----------
+        variables : list
+            A one-dimensional list of variables representing the concentrations
+            of reactants, products, and the surface coverage of adsorbed species.
+
+        Returns
+        -------
+        tuple
+            A tuple containing three elements:
+            - c_reactants : list
+                Concentrations of reactant species.
+            - c_products : list
+                Concentrations of product species.
+            - theta : list
+                Fractional surface coverage of adsorbed species.
         """
+
         c_reactants = variables[: len(self.species.reactants)]
         c_products = variables[
                      len(self.species.reactants): -len(self.species.adsorbed)
@@ -340,24 +492,28 @@ class DynamicConcentration(BaseConcentration):
             self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
     ) -> np.ndarray:
         """
-        Compute the right-hand side of the equation for the given reactant, product concentrations, and parameter theta.
+        Computes the right-hand side of the set of differential equations governing the
+        reaction system. This involves combining contributions from the reactants,
+        products, and additional state variables (`theta`), considering the changes
+        relative to their initial concentrations and system operational parameters.
 
-        This function takes the concentrations of reactants and products and computes the right-hand side of the equation.
-        It returns a concatenated numpy array containing the computed values for the reactants, products, and a zero-filled
-        array of the same length as the theta parameter. This is typically used for simulations or mathematical modeling
-        involving chemical species and their concentrations.
+        Parameters
+        ----------
+        c_reactants : np.ndarray
+            Concentrations of the reactant species in the system.
+        c_products : np.ndarray
+            Concentrations of the product species in the system.
+        theta : np.ndarray
+            Additional state variables representing system-specific parameters or
+            conditions.
 
-        :param c_reactants: Concentrations of reactants.
-        :type c_reactants: np.ndarray
-        :param c_products: Concentrations of products.
-        :type c_products: np.ndarray
-        :param theta: Parameter array theta, often related to system parameters or conditions.
-        :type theta: np.ndarray
-
-        :return: A concatenated array containing the computed values for reactants, products, and a zero-filled array
-                 of the same length as theta.
-        :rtype: np.ndarray
+        Returns
+        -------
+        np.ndarray
+            A combined array representing the contributions of reactants, products, and
+            additional state variables to the right-hand side of the equations.
         """
+
         return np.concatenate(
             [
                 (c_reactants - self.species.c0_reactants)
@@ -408,33 +564,52 @@ class Calculator:
 
     def __init__(self, kpy, name=None):
         """
-        Initializes the Calculator class and sets up default attributes and related objects required for computational processes.
+        Initializes a Calculator instance and sets it up to calculate based on the provided
+        kpy data structure. Determines the operation type (dynamic or static concentration) and
+        computes the solution for the system.
 
-        Attributes:
-            name: str
-                The name assigned to the calculator instance. If not provided, defaults to 'melek'.
-            writer: Writer
-                An instance of the Writer class used for logging and messaging.
-            Kpy: <type>
-                A deep copy of the input kpy object used for operations and computations.
-            data: <type>
-                Holds the data contained within the Kpy object, representing input information for the calculations.
-            operation: <type>
-                References the `parameters` attribute of the data object and represents operational parameters.
-            potential: <type>
-                References the `potential` attribute within the operational parameters.
-            species: <type>
-                Represents all species involved in the system, extracted from the data object.
-            reactions: <type>
-                Represents all reactions within the system, extracted from the data object.
-            strategy: DynamicConcentration or StaticConcentration
-                Chooses between dynamic or static concentration strategies based on the cstr attribute in operation.
-            results: <type>
-                Stores the output of the solver executed from the selected strategy.
+        Parameters
+        ----------
+        kpy : object
+            The input data structure that contains all necessary information for constructing
+            the Calculator, including data, parameters, species, and reactions.
 
-        Raises:
-            ValueError
-                Raised if the results from the strategy solver contain negative values in `theta`.
+        name : str, optional
+            The name of the calculator. If not provided, defaults to 'melek'.
+
+        Attributes
+        ----------
+        name : str
+            The name of the calculator instance.
+
+        writer : Writer
+            Handles logging and messaging for the instance.
+
+        Kpy : object
+            A deepcopy of the provided `kpy` input to prevent modifications to the original
+            object.
+
+        data : object
+            Extracted data object from `kpy` containing various system configurations.
+
+        operation : object
+            Parameters for the operation derived from the `data` object.
+
+        potential : narray
+            Potential derived from the operation's parameters.
+
+        species : object
+            Species list derived from the `data`.
+
+        reactions : object
+            Reaction information derived from the `data`.
+
+        strategy : object
+            Dynamic or static concentration calculation strategy determined based on whether
+            CSTR operation is specified in the `operation`.
+
+        results : object
+            Solution results obtained by applying the selected strategy's solver method.
         """
         if name is None:
             self.name = 'melek'

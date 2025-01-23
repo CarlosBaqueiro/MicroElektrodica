@@ -18,3 +18,4 @@ API Documentation
    Coordinator <apidoc-pages/coordinator>
    Grapher <apidoc-pages/grapher>
    Writer <apidoc-pages/writer>
+   Tools Writer <apidoc-pages/tools>

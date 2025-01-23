@@ -89,15 +89,17 @@ class RateConstants:
 
     .. math::
 
-       \\overrightarrow{k_i} = A \\underbrace{\\exp\\left(\\frac{- \\Delta G^{\\circ}_{a,i}} {k_BT} \\right)}_{\\textit{Thermodynamic}}
-        \\underbrace{\\exp\\left(\\frac{n_i\\beta_i\\eta} {k_BT} \\right)}_{\\textit{Electronic}}
+       \\overrightarrow{k_i} = A
+            \\underbrace{\\exp\\left(\\frac{- \\Delta G^{\\circ}_{a,i}} {k_BT} \\right)}_{\\textit{Thermodynamic}}
+            \\underbrace{\\exp\\left(\\frac{n_i\\beta_i\\eta} {k_BT} \\right)}_{\\textit{Electronic}}
 
     .. math::
 
-        \\overleftarrow{k_i} = \\frac{\\overrightarrow{k_i}}{K_{eq,i}}=A
-        \\underbrace{\\exp\\left(\\frac{-\\Delta G^{\\circ}_{a,i} +
-            \\Delta G^\\circ_{r,i}}{k_BT} \\right)}_{\\textit{Thermodynamic}}
-        \\underbrace{\\exp\\left(\\frac{-n_i(1-\\beta_i)\\eta}{k_BT} \\right)}_{\\textit{Electronic}}
+        \\overleftarrow{k_i} =
+            \\frac{\\overrightarrow{k_i}}{K_{eq,i}} = A
+                \\underbrace{\\exp\\left(\\frac{-\\Delta G^{\\circ}_{a,i} +
+                    \\Delta G^\\circ_{r,i}}{k_BT} \\right)}_{\\textit{Thermodynamic}}
+                \\underbrace{\\exp\\left(\\frac{-n_i(1-\\beta_i)\\eta}{k_BT} \\right)}_{\\textit{Electronic}}
 
 
     This class is designed to facilitate the computation of various constants and parameters
@@ -402,13 +404,13 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         Object used for logging and managing output messages.
     data : copy.deepcopy
         Deep copy of the input data for initializing the model.
-    parameters : dict
+    parameters : object
         Reaction parameters extracted from the input data.
-    species : list
+    species : object
         List of species involved in the reactions.
     reactions : object
         Reactions data including forward and backward reaction rates.
-    operation : dict
+    operation : object
         Operational parameters derived from input data.
     electrode : float
         Factor to determine the nature of the electrode (e.g., anode or cathode).
@@ -613,7 +615,11 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
 
     def current(self, potential, c_reactants, c_products, theta):
         """
-        Calculates the electric current for the given system based on the provided input parameters.
+        Calculates the kinetic current density.
+
+        .. math::
+
+            J = F\\sum_i n_i \\nu_i
 
         This method models the relationship between the potential, concentrations of reactants and
         products, and other factors to compute the net current. The computation utilizes the
@@ -644,6 +650,12 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
     def dcdt(self, rate, upsilon: np.ndarray) -> np.ndarray:
         """
         Computes the dot product of a given rate and upsilon values.
+
+        .. math::
+            \\frac{\\partial c_j}{\\partial t} =\\sum_i \\upsilon_{ij} \\nu_i
+
+        .. math::
+            \\frac{\\partial \\theta_j}{\\partial t} =\\sum_i \\upsilon_{ij} \\nu_i
 
         This method calculates the dot product of a rate value with an array
         of upsilon values using the numpy dot function. It is designed to

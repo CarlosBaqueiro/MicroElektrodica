@@ -39,10 +39,43 @@ class Coordinator:
     """
 
     def __init__(self, kpy):
+        """
+        Instantiates a new object using a deep copy of the provided `kpy` object. The copied
+        object's data attribute is assigned directly to the instance's `data` attribute. This
+        ensures the immutability of the provided input and initializes the data attribute
+        for further operations.
+
+        Parameters
+        ----------
+        kpy : object
+            The object to be deeply copied and used for initialization. Its `data` attribute
+            will be accessed and assigned to the instance.
+        """
         self.Kpy = copy.deepcopy(kpy)
         self.data = self.Kpy.data
 
     def plot_rxn_coords_potential(self, source, target, eta, fname):
+        """
+        Plots reaction coordinates and potential energy for pathways between the source and the target.
+
+        This function primarily utilizes information from the stoichiometric graph to identify
+        reaction pathways and compute reaction coordinates and potentials. It produces individual
+        plots for each identified pathway, illustrating the progress of reactions and corresponding
+        potential energy changes.
+
+        Parameters
+        ----------
+        source : str
+            Identifier for the starting species in the pathway.
+        target : str
+            Identifier for the target species in the pathway.
+        eta : float
+            Parameter affecting the visualization of reaction coordinates and potential energy. Its exact
+            purpose depends on the implementation of the plotting function.
+        fname : str
+            Base file name to save the generated plots. Each pathway will be saved as an individual
+            file, with a unique suffix indicating the pathway index.
+        """
         self.upsilon = copy.deepcopy(self.data.reactions.upsilon_c)
         self.species = copy.deepcopy(self.data.species.list)
         self.reactions = copy.deepcopy(self.data.reactions.list)
@@ -262,21 +295,6 @@ class Coordinator:
             energies[2 * i + 2] = energies[2 * i] + ddg[idx]
         energies -= energies[zero]
         return energies
-
-    def format_latex_chemical(sef, species):
-        chemicals = []
-        for chem in species:
-            # Añade subíndices: coloca lo que está después de un número como "_" para subíndice
-            formatted = ""
-            for char in chem:
-                if char.isdigit():
-                    formatted += f"_{char}"  # Usa subíndice en LaTeX
-                elif char == '+':
-                    formatted += "^+"
-                else:
-                    formatted += char
-            chemicals.append(f"$\\mathrm{{{formatted}}}$")  # Agregar delimitadores de LaTeX
-        return chemicals
 
     def plotter_rxn_coords_potential(self, p, path, potential, figname):
         """
