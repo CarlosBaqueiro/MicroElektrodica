@@ -13,6 +13,7 @@
 import os
 import sys
 from melektrodica import __version__
+
 sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
@@ -20,8 +21,8 @@ sys.path.insert(0, os.path.abspath("../"))
 # -- Project information -----------------------------------------------------
 
 project = "μElektrodica"
-copyright = "Copyright (C) 2024 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez"
-author = "μElektrodica Developers"
+copyright = "2025 C. Baqueiro Basto, M. Secanell, L.C. Ordoñez"
+author = "MicroElektrodica Developers"
 version = __version__
 release = __version__
 
@@ -31,16 +32,18 @@ release = __version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-language = 'en'
+language = "en"
 
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.autosummary",
-    'sphinx.ext.napoleon',
+    "sphinx.ext.napoleon",
     "nbsphinx",
     "nbsphinx_link",
-    'sphinxcontrib.bibtex',
+    "sphinxcontrib.bibtex",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.imgmath",
 ]
 
 napoleon_google_docstring = True
@@ -51,7 +54,7 @@ napoleon_google_docstring = True
 # napoleon_use_ivar = True  # option for attribute section formatting
 # napoleon_use_param = False  # option for parameter section formatting
 # viewcode_import = True  # tries to find the source files
-bibtex_bibfiles = ['bib.bib']
+bibtex_bibfiles = ["bib.bib"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -59,7 +62,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", '**.ipynb_checkpoints']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 # -- Options for HTML output -------------------------------------------------
 

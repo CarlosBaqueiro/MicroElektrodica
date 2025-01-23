@@ -35,9 +35,9 @@ class Hydrogen:
         self.data.species.g_formation_ads = self.data.species.g_formation_ads
         self.data.reactions.ga = self.data.reactions.ga
 
-        print('\ng0:')
-        print('ga: ', self.data.reactions.ga)
-        print('g_formation: ', self.data.species.g_formation_ads)
+        print("\ng0:")
+        print("ga: ", self.data.reactions.ga)
+        print("g_formation: ", self.data.species.g_formation_ads)
 
         j_hb = np.array(
             [
@@ -82,18 +82,20 @@ class Hydrogen:
         F = Fitter(self.data, vdata, jdata)
         self.data.reactions.ga = F.ga_fit
         self.data.species.g_formation_ads = F.gf_fit
-        print('\ng_fit:')
-        print('ga: ', self.data.reactions.ga)
-        print('g_formation: ', self.data.species.g_formation_ads)
+        print("\ng_fit:")
+        print("ga: ", self.data.reactions.ga)
+        print("g_formation: ", self.data.species.g_formation_ads)
 
         self.nmelek = Calculator(self.data)
 
-        plt.plot(vdata, jdata, 'o', label='Experimental Data')
-        #plt.plot(_data.parameters.potential, abs(_melek.results.j), label='Original')
-        plt.plot(self.data.parameters.potential, abs(self.nmelek.results.j), label='Fit')
-        plt.xlabel('Potential (V)')
-        plt.ylabel('J (A/cm$^2$)')
-        plt.yscale('log')
+        plt.plot(vdata, jdata, "o", label="Experimental Data")
+        # plt.plot(_data.parameters.potential, abs(_melek.results.j), label='Original')
+        plt.plot(
+            self.data.parameters.potential, abs(self.nmelek.results.j), label="Fit"
+        )
+        plt.xlabel("Potential (V)")
+        plt.ylabel("J (A/cm$^2$)")
+        plt.yscale("log")
         plt.ylim(1e-3, 10)
         plt.xlim(0, 0.5)
         plt.legend()
@@ -107,9 +109,9 @@ class Hydrogen2:
         self.data.species.g_formation_ads = np.array([75]) * 1e-3
         self.data.reactions.ga = np.array([196, 294, 48]) * 1e-3
 
-        #source = self.data.species.reactants[0]
-        #target = self.data.species.products[0]
-        source, target = ['H2', 'H+']
+        # source = self.data.species.reactants[0]
+        # target = self.data.species.products[0]
+        source, target = ["H2", "H+"]
         eta = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
         fname = "Wang2007Hydrogen"
         self.Kpy = Kpynetic(self.data)
@@ -130,9 +132,9 @@ class Oxygen:
         _Kpy = Kpynetic(_data)
         _melek = Calculator(_Kpy)
 
-        print('g0:')
-        print('ga: ', self.data.reactions.ga)
-        print('g_formation: ', self.data.species.g_formation_ads)
+        print("g0:")
+        print("ga: ", self.data.reactions.ga)
+        print("g_formation: ", self.data.species.g_formation_ads)
 
         p021 = np.array(
             [
@@ -184,35 +186,37 @@ class Oxygen:
         F = Fitter(self.data, vdata, jdata)
         self.data.reactions.ga = F.ga_fit
         self.data.species.g_formation_ads = F.gf_fit
-        print('\ng_fit:')
-        print('ga: ', self.data.reactions.ga)
-        print('g_formation: ', self.data.species.g_formation_ads)
+        print("\ng_fit:")
+        print("ga: ", self.data.reactions.ga)
+        print("g_formation: ", self.data.species.g_formation_ads)
         self.data.parameters.potential = _data.parameters.potential
         self.nmelek = Calculator(self.data)
         G = Grapher(self.nmelek.results)
-        list = {self.melek, ('', '-', 'tab:orange')}
-        G.plot_results(list, 'prueba')
-        plt.plot(vdata, jdata, 'o', label='Experimental Data')
-        plt.plot(_data.parameters.potential, abs(_melek.results.j), label='Original')
-        plt.plot(self.data.parameters.potential, abs(self.nmelek.results.j), label='Fit')
-        plt.xlabel('Potential (V)')
-        plt.ylabel('J (A/cm$^2$)')
-        plt.yscale('log')
+        list = {self.melek, ("", "-", "tab:orange")}
+        G.plot_results(list, "prueba")
+        plt.plot(vdata, jdata, "o", label="Experimental Data")
+        plt.plot(_data.parameters.potential, abs(_melek.results.j), label="Original")
+        plt.plot(
+            self.data.parameters.potential, abs(self.nmelek.results.j), label="Fit"
+        )
+        plt.xlabel("Potential (V)")
+        plt.ylabel("J (A/cm$^2$)")
+        plt.yscale("log")
         plt.legend()
         plt.show()
 
-        plt.plot(_data.parameters.potential, _melek.results.theta, label='Original')
-        plt.plot(self.data.parameters.potential, self.nmelek.results.theta, label='Fit')
-        plt.xlabel('Potential (V)')
-        plt.ylabel('fc')
-        plt.yscale('log')
+        plt.plot(_data.parameters.potential, _melek.results.theta, label="Original")
+        plt.plot(self.data.parameters.potential, self.nmelek.results.theta, label="Fit")
+        plt.xlabel("Potential (V)")
+        plt.ylabel("fc")
+        plt.yscale("log")
         plt.legend()
         plt.show()
 
-        plt.plot(_data.parameters.potential, _melek.results.theta, label='Original')
-        plt.plot(self.data.parameters.potential, self.nmelek.results.theta, label='Fit')
-        plt.xlabel('Potential (V)')
-        plt.ylabel('fc')
+        plt.plot(_data.parameters.potential, _melek.results.theta, label="Original")
+        plt.plot(self.data.parameters.potential, self.nmelek.results.theta, label="Fit")
+        plt.xlabel("Potential (V)")
+        plt.ylabel("fc")
         plt.legend()
         plt.show()
 
@@ -221,10 +225,10 @@ class Oxygen2:
     def __init__(self):
         directory = os.path.join("Moore2013Oxygen")
         self.data = Collector(directory)
-        #self.data.reactions.ga = np.array([258, 459, 502, 455]) * 1e-3
-        #self.data.species.g_formation_ads = np.array([-477, -120]) * 1e-3
+        # self.data.reactions.ga = np.array([258, 459, 502, 455]) * 1e-3
+        # self.data.species.g_formation_ads = np.array([-477, -120]) * 1e-3
         self.Kpy = Kpynetic(self.data)
-        #coo = Coordinator(self.Kpy)
+        # coo = Coordinator(self.Kpy)
         source = self.data.species.reactants[0]
         target = self.data.species.products[0]
         print(source)
@@ -234,7 +238,7 @@ class Oxygen2:
 
 
 if __name__ == "__main__":
-    #Hydrogen()
+    # Hydrogen()
     Hydrogen2()
-    #Oxygen()
-    #Oxygen2()
+    # Oxygen()
+    # Oxygen2()

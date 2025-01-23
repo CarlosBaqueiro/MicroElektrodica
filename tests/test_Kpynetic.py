@@ -101,9 +101,9 @@ class TestRateConstants(unittest.TestCase):
         thermochemical = 10
         electronic = 5
         expected_result = (
-                pre_exponential
-                * experimental
-                * np.exp(-(thermochemical + electronic) / (8.617333262145e-5) / 300)
+            pre_exponential
+            * experimental
+            * np.exp(-(thermochemical + electronic) / (8.617333262145e-5) / 300)
         )
 
         result = self.RateConstants.constant(
@@ -122,7 +122,9 @@ class TestRateConstants(unittest.TestCase):
         G_formation = np.array([100])
         G_activation = np.array([80])
         upsilon = np.array([1.0])
-        expected_result = np.array([G_activation, G_activation - (upsilon @ G_formation)])
+        expected_result = np.array(
+            [G_activation, G_activation - (upsilon @ G_formation)]
+        )
         result = self.RateConstants.thermochemical(G_activation, G_activation, upsilon)
         print(expected_result, result)
         np.testing.assert_array_equal(result, expected_result)

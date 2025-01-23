@@ -18,7 +18,7 @@ from .writer import Writer
 
 
 # for debugging
-#import sys
+# import sys
 # sys.exit()
 # from .Tools import showme
 
@@ -107,7 +107,7 @@ class Fitter(Calculator):
 
         """
         if name is None:
-            self.name = 'melek'
+            self.name = "melek"
         else:
             self.name = name
 
@@ -164,7 +164,7 @@ class Fitter(Calculator):
             g_fit = differential_evolution(
                 func=self.object,
                 bounds=self.bounds,
-                strategy='best1bin',
+                strategy="best1bin",
                 popsize=15,
                 tol=1e-3,
                 mutation=(0.5, 1.0),
@@ -172,9 +172,9 @@ class Fitter(Calculator):
                 seed=None,
                 disp=False,
                 polish=True,
-                init='latinhypercube',
-                updating='immediate',
-                callback=self.display_error_evolution
+                init="latinhypercube",
+                updating="immediate",
+                callback=self.display_error_evolution,
             )
             return g_fit
 
@@ -212,7 +212,7 @@ class Fitter(Calculator):
 
             # Calculate the squared error with respect to the experimental data
             error = np.sum(np.pow(self.j_data - j_fit, 2) / self.j_data)
-            #print(f"Error: {error}")
+            # print(f"Error: {error}")
             self.error_evolution.append(error)
             return error
         except Exception as e:
@@ -246,8 +246,8 @@ class Fitter(Calculator):
         """
         if isinstance(variables, tuple):
             variables = variables[0]
-        a = variables[:len(self.data.reactions.list)]
-        f = variables[len(self.data.reactions.list):]
+        a = variables[: len(self.data.reactions.list)]
+        f = variables[len(self.data.reactions.list) :]
         return a, f
 
     def current_energies(self, *energies):
@@ -286,7 +286,9 @@ class Fitter(Calculator):
         try:
             ga, gf = self.unziper(energies)
             # Update Kpy with thermodynamic values
-            self.Kpy.thermochemical_part = self.Kpy.thermochemical(ga, gf, self.results.data.reactions.upsilon_a)
+            self.Kpy.thermochemical_part = self.Kpy.thermochemical(
+                ga, gf, self.results.data.reactions.upsilon_a
+            )
             self.results = self.strategy.solver()
             return self.results.j
 
@@ -337,3 +339,30 @@ class Fitter(Calculator):
         plt.show()
         plt.pause(0.01)
 
+    def new_results(self, new_potential):
+        """
+        Updates the calculator with new potential values and calculates the respective
+        thermochemical parameters utilizing the current state of the system.
+
+        The method modifies the potential attribute in the parameters and recalculates
+        the thermochemical part within the `Kpy`. After applying the thermodynamic
+        calculations, it returns a new `Calculator` object initialized with the updated
+        `Kpy` instance and the mode specified.
+
+        Parameters
+        ----------
+        new_potential : float
+            The new potential value to be assigned for recalculations.
+
+        Returns
+        -------
+        Calculator
+            A new Calculator instance initialized with the updated `Kpy` object
+            and the mode set as 'Fitter'.
+        """
+        # Update Kpy with thermodynamic and potential values
+        self.data.parameters.potential = new_potential
+        self.Kpy.thermochemical_part = self.Kpy.thermochemical(
+            self.ga_fit, self.gf_fit, self.results.data.reactions.upsilon_a
+        )
+        return Calculator(self.Kpy, 'Fitter')

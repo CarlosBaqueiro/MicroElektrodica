@@ -32,10 +32,14 @@ def adjust_curves(directory, file):
 
 if __name__ == "__main__":
     # Create the parser for command-line arguments
-    parser = argparse.ArgumentParser(description="Script to perform calculations and curve fitting.")
+    parser = argparse.ArgumentParser(
+        description="Script to perform calculations and curve fitting."
+    )
 
     # Positional argument: directory
-    parser.add_argument("directory", type=str, help="Main directory to process the data.")
+    parser.add_argument(
+        "directory", type=str, help="Main directory to process the data."
+    )
 
     # Optional argument: data file for curve fitting
     parser.add_argument("-f", "--file", type=str, help="Data file for curve fitting.")

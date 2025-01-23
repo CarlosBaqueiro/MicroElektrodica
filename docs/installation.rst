@@ -3,7 +3,7 @@
 Installation
 ===============
 
-The most recent version of μElektrodica can be obtained through PYPI by using the following command::
+The most recent version of *μ*\Elektrodica can be obtained through PYPI by using the following command::
 
     pip install melektrodica
 

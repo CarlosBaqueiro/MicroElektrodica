@@ -3,8 +3,8 @@
 """
 
     μElektrodica © 2025
-        by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
-        is licensed under CC BY-NC-SA 4.0
+        by C. Baqueiro Basto, M. Secanell, L.C. Ordoñez,
+        licensed under CC BY-NC-SA 4.0
 
         Calculator class
 
@@ -121,23 +121,23 @@ class BaseConcentration:
 
     def solver(self):
         """
-            solver(self)
+        solver(self)
 
-            Solves a system of equations for steady-state reaction kinetics and computes
-            reactant, product, and adsorbed species concentrations as well as the
-            current density for a range of applied potentials. The method utilizes
-            numerical root-finding techniques to achieve steady-state solutions.
+        Solves a system of equations for steady-state reaction kinetics and computes
+        reactant, product, and adsorbed species concentrations as well as the
+        current density for a range of applied potentials. The method utilizes
+        numerical root-finding techniques to achieve steady-state solutions.
 
-            During the solving process, runtime warnings are captured and logged for
-            debugging purposes. If convergence issues occur, an exception is raised
-            for the specific potential value.
+        During the solving process, runtime warnings are captured and logged for
+        debugging purposes. If convergence issues occur, an exception is raised
+        for the specific potential value.
 
-            Returns
-            -------
-            self : object
-                The instance of the class with updated attributes for steady-state
-                reactant, product, adsorbed species concentrations, computed current
-                densities, and other intermediate results.
+        Returns
+        -------
+        self : object
+            The instance of the class with updated attributes for steady-state
+            reactant, product, adsorbed species concentrations, computed current
+            densities, and other intermediate results.
         """
 
         with warnings.catch_warnings(record=True) as w:
@@ -167,7 +167,9 @@ class BaseConcentration:
 
         for warning in w:
             if issubclass(warning.category, RuntimeWarning):
-                self.Kpy.writer.logger.error(f"WARNING at potential {potential}: {warning.message}")
+                self.Kpy.writer.logger.error(
+                    f"WARNING at potential {potential}: {warning.message}"
+                )
                 if "The iteration is not making good progress" in str(warning.message):
                     raise RuntimeError(f"Convergence failed at potential {potential}")
         return self
@@ -266,7 +268,7 @@ class BaseConcentration:
         c_reactants, c_products, theta = self.unzip_variables(variables)
         rhs = self.right_hand_side(c_reactants, c_products, theta)
         self.Kpy.foverpotential(potential, c_reactants, c_products, theta)
-        return self.Kpy.dcdt(self.Kpy.v, self.reactions.upsilonx) - rhs
+        return self.Kpy.dcdt(self.Kpy.nu, self.reactions.upsilonx) - rhs
 
     def current(self, variables, potential):
         """
@@ -483,13 +485,13 @@ class DynamicConcentration(BaseConcentration):
 
         c_reactants = variables[: len(self.species.reactants)]
         c_products = variables[
-                     len(self.species.reactants): -len(self.species.adsorbed)
-                     ]
-        theta = variables[-len(self.species.adsorbed):]
+            len(self.species.reactants) : -len(self.species.adsorbed)
+        ]
+        theta = variables[-len(self.species.adsorbed) :]
         return c_reactants, c_products, theta
 
     def right_hand_side(
-            self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
+        self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
     ) -> np.ndarray:
         """
         Computes the right-hand side of the set of differential equations governing the
@@ -612,7 +614,7 @@ class Calculator:
             Solution results obtained by applying the selected strategy's solver method.
         """
         if name is None:
-            self.name = 'melek'
+            self.name = "melek"
         else:
             self.name = name
 
@@ -631,7 +633,7 @@ class Calculator:
         else:
             self.strategy = StaticConcentration(self.Kpy)
 
-        #def strategy_solver(self):
+        # def strategy_solver(self):
         self.results = self.strategy.solver()
         if np.any(self.results.theta < 0):
             self.writer.logger.error("Solution contains negative values")

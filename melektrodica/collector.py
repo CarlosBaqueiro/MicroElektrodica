@@ -65,7 +65,7 @@ class DataParameters:
     :type G_formation: bool
     """
 
-    def __init__(self, parameters_file: str, writer) -> None:
+    def __init__(self, parameters_file: str, writer: object) -> None:
         """
         A class used to manage and initialize simulation parameters for different chemical
         and experimental scenarios. It processes the parameters and variables from the
@@ -156,18 +156,31 @@ class DataParameters:
     # TODO: Add data recollection for more models and operations conditions
 
 
-def initialize(values: list, lista: list, name: str) -> bool:
+def initialize(values: list, lista: list[str], name: str) -> bool:
     """
-    Checks if a given name exists in a list and if the corresponding value in another
-    list is 'True'.
+    Initialize a condition based on provided parameters.
 
-    :param values: List of values where each position corresponds to an element
-                   in 'lista'.
-    :param lista: List of names to be checked.
-    :param name: Name to be searched within 'lista'.
+    The function checks if the provided `name` exists in the `lista`, and if the
+    corresponding value from the `values` list indexed by `name` in `lista` equals
+    "True". If the condition is satisfied, the function returns True; otherwise,
+    returns False.
 
-    :return: Returns True if 'name' is found in 'lista' and the corresponding value
-             in 'values' is 'True'. Otherwise, returns False.
+    Parameters
+    ----------
+    values : list
+        A list of values whose indices correspond to the elements of the `lista`.
+
+    lista : list of str
+        A list of string identifiers used to locate the value in `values` that is
+        compared to "True".
+
+    name : str
+        The specific name or identifier to locate within `lista`.
+
+    Returns
+    -------
+    bool
+        Returns `True` if the condition is satisfied, `False` otherwise.
     """
     if name in lista and values[lista == name] == "True":
         return True
@@ -210,7 +223,25 @@ class DataSpecies:
     :type G_formation_prd: numpy.ndarray
     """
 
-    def __init__(self, species_file, parameters, writer):
+    def __init__(self, species_file: str, parameters: object, writer: object) -> None:
+        """
+        Represents a chemical species processor and organizer for various categories such
+        as reactants, products, adsorbed species, and catalysts based on input data
+        from a file. This class also processes initial concentrations and thermochemical
+        data when applicable.
+
+        Parameters
+        ----------
+        species_file : str
+            Path to the input file containing species data.
+        parameters : object
+            Object containing simulation or experiment parameters, including flags like
+            `thermochemical` and `g_formation` to determine if thermochemical processing
+            is required.
+        writer : object
+            Logger or writer object for real-time messaging and updates during
+            processing.
+        """
         writer.message(f"Reading Species data from file: {species_file}")
         header, raw_data = Collector.raw_data(species_file, writer=writer)
         Collector.column_exists("Species", header, species_file, writer)
@@ -315,7 +346,9 @@ class DataReactions:
         Gibbs free energy changes for reactions, if available in data and requested.
     """
 
-    def __init__(self, reaction_file, parameters, species, writer):
+    def __init__(
+            self, reaction_file: str, parameters: object, species: object, writer: object
+    ) -> None:
         writer.message(f"Reading Reactions data from file: {reaction_file}")
         header, raw_data = Collector.raw_data(reaction_file, writer=writer)
         Collector.column_exists("id", header, reaction_file, writer)
@@ -346,7 +379,9 @@ class DataReactions:
         self.upsilon_c = self.upsilon[
                          :, : -len(species.catalyst)
                          ]  # All coefficients, without catalysts
-        self.upsilon_a = self.upsilon_c[:, -len(species.adsorbed):]  # Adsorbates coefficients
+        self.upsilon_a = self.upsilon_c[
+                         :, -len(species.adsorbed):
+                         ]  # Adsorbates coefficients
         writer.message("Reaction matrix processed.")
 
         if parameters.cstr:
@@ -448,17 +483,22 @@ class Collector:
         self.directory = directory
         writer = Writer(log_file="melektrodica.log", log_directory=self.directory)
         writer.message("***  Collector  ***")
-        self.parameters = DataParameters(os.path.join(directory, "parameters.md"), writer)
+        self.parameters = DataParameters(
+            os.path.join(directory, "parameters.md"), writer
+        )
         self.species = DataSpecies(
             os.path.join(directory, "species.md"), self.parameters, writer
         )
         self.reactions = DataReactions(
-            os.path.join(directory, "reactions.md"), self.parameters, self.species, writer
+            os.path.join(directory, "reactions.md"),
+            self.parameters,
+            self.species,
+            writer,
         )
         writer.message("***  Data collection completed successfully.  ***\n")
 
     @staticmethod
-    def raw_data(name_file, writer):
+    def raw_data(name_file: str, writer: object):
         """
         Retrieves raw data from a file formatted with a specific delimiter and structure.
 
@@ -506,7 +546,9 @@ class Collector:
         return header, raw_data
 
     @staticmethod
-    def column_exists(column_name, header, file_name, writer):
+    def column_exists(
+            column_name: str, header: list[str], file_name: str, writer: object
+    ):
         """
         Check if a specific column exists within a given header and log an error if it does not.
 
@@ -533,6 +575,9 @@ class Collector:
 
         """
         if column_name not in header:
-            writer.logger.critical(f"ERROR Column 'DG_formation' not found in the {file_name} header.")
+            writer.logger.critical(
+                f"ERROR Column 'DG_formation' not found in the {file_name} header."
+            )
             raise ValueError(
-                f"The required 'DG_formation' column is missing from the input file {file_name}. Please check the file.")
+                f"The required 'DG_formation' column is missing from the input file {file_name}. Please check the file."
+            )

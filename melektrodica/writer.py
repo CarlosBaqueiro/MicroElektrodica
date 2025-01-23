@@ -39,9 +39,11 @@ class Writer:
             self._is_initialized = True  # Marks the instance as initialized
 
             try:
-                os.makedirs('MicroElektrodicaResults', exist_ok=True)
+                os.makedirs("MicroElektrodicaResults", exist_ok=True)
             except Exception as e:
-                print(f"An error occurred while creating the directory MicroElektrodicaResults: {e}")
+                print(
+                    f"An error occurred while creating the directory MicroElektrodicaResults: {e}"
+                )
                 return
 
     def _setup_logger(self):
@@ -61,9 +63,11 @@ class Writer:
         log_file_path = os.path.join(self.log_directory, self.log_file)
 
         # Configure the file handler (saves logs to a file)
-        file_handler = logging.FileHandler(log_file_path, mode='w')  # Overwrites the file every time
+        file_handler = logging.FileHandler(
+            log_file_path, mode="w"
+        )  # Overwrites the file every time
         file_handler.setLevel(logging.INFO)
-        file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(file_formatter)
         self.logger.addHandler(file_handler)
 
@@ -82,12 +86,12 @@ class Writer:
             console_formatter = ColoredFormatter(
                 "%(log_color)s%(levelname)s: %(message)s",
                 log_colors={
-                    'DEBUG': 'white',
-                    'INFO': 'green',
-                    'WARNING': 'yellow',
-                    'ERROR': 'red',
-                    'CRITICAL': 'bold_red',
-                }
+                    "DEBUG": "white",
+                    "INFO": "green",
+                    "WARNING": "yellow",
+                    "ERROR": "red",
+                    "CRITICAL": "bold_red",
+                },
             )
             console_handler.setFormatter(console_formatter)
             self.logger.addHandler(console_handler)
@@ -108,7 +112,9 @@ class Writer:
         :param results: Object containing the data (e.g., potential, theta, j) to be written into the markdown file.
         """
 
-        fname = os.path.join(calculator.data.directory, 'MicroElektrodicaResults', filname + '.md')
+        fname = os.path.join(
+            calculator.data.directory, "MicroElektrodicaResults", filname + ".md"
+        )
         # Define the columns with "Potential" as the first one
         columns = ["Overpotential [V]"]
         rows = []
@@ -117,33 +123,40 @@ class Writer:
         def format_scientific(value):
             return f"{value:.5e}"
 
-        if variable == 'theta' or variable == 'fval':
+        if variable == "theta" or variable == "fval":
             # Add column names for adsorbed species
             columns += [specie for specie in calculator.species.adsorbed]
             # Build rows with potential and theta values
-            for potential, theta_values in zip(calculator.potential, calculator.results.theta):
+            for potential, theta_values in zip(
+                calculator.potential, calculator.results.theta
+            ):
                 # Convert all values to scientific notation
-                formatted_row = [format_scientific(potential)] + [format_scientific(val) for val in theta_values]
+                formatted_row = [format_scientific(potential)] + [
+                    format_scientific(val) for val in theta_values
+                ]
                 rows.append(formatted_row)
-        elif variable == 'j':
+        elif variable == "j":
             # Add column name for "Current"
             columns += ["Current [A/cm2]"]
             # Build rows with potential and current values
             for potential, current in zip(calculator.potential, calculator.results.j):
                 # Convert all values to scientific notation
-                formatted_row = [format_scientific(potential), format_scientific(current)]
+                formatted_row = [
+                    format_scientific(potential),
+                    format_scientific(current),
+                ]
                 rows.append(formatted_row)
 
         try:
             # Open the markdown file in write mode
-            with open(fname, 'w') as md_file:
+            with open(fname, "w") as md_file:
                 # Write the column headers
-                md_file.write('| ' + ' | '.join(columns) + ' |\n')
+                md_file.write("| " + " | ".join(columns) + " |\n")
                 # Write the separator for the table
-                md_file.write('|' + '---|' * len(columns) + '\n')
+                md_file.write("|" + "---|" * len(columns) + "\n")
                 # Write the data rows
                 for row in rows:
-                    md_file.write('| ' + ' | '.join(row) + ' |\n')
+                    md_file.write("| " + " | ".join(row) + " |\n")
             print(f"Successfully written table to {fname}")
         except Exception as e:
             print(f"An error occurred while writing to the file: {e}")
@@ -155,7 +168,9 @@ class Writer:
         :param variable: The variable type that determines the specific data to write (e.g., "theta" or "j").
         :param calculator: Object containing the data (e.g., potential, theta, j) to be written into the CSV file.
         """
-        fname = os.path.join(calculator.data.directory, 'MicroElektrodicaResults', filename + '.csv')
+        fname = os.path.join(
+            calculator.data.directory, "MicroElektrodicaResults", filename + ".csv"
+        )
         # Define the columns with "Potential" as the first one
         columns = ["Overpotential [V]"]
         rows = []
@@ -165,26 +180,33 @@ class Writer:
             return f"{value:.5e}"
 
         # Check which variable type we are handling
-        if variable == 'theta' or variable == 'fval':
+        if variable == "theta" or variable == "fval":
             # Add column names for adsorbed species
             columns += [specie for specie in calculator.species.adsorbed]
             # Build rows with potential and theta values
-            for potential, theta_values in zip(calculator.potential, calculator.results.theta):
+            for potential, theta_values in zip(
+                calculator.potential, calculator.results.theta
+            ):
                 # Convert all values to scientific notation
-                formatted_row = [format_scientific(potential)] + [format_scientific(val) for val in theta_values]
+                formatted_row = [format_scientific(potential)] + [
+                    format_scientific(val) for val in theta_values
+                ]
                 rows.append(formatted_row)
-        elif variable == 'j':
+        elif variable == "j":
             # Add column name for "Current"
             columns += ["Current [A/cm2]"]
             # Build rows with potential and current values
             for potential, current in zip(calculator.potential, calculator.results.j):
                 # Convert all values to scientific notation
-                formatted_row = [format_scientific(potential), format_scientific(current)]
+                formatted_row = [
+                    format_scientific(potential),
+                    format_scientific(current),
+                ]
                 rows.append(formatted_row)
 
         try:
             # Open the CSV file in write mode
-            with open(fname, 'w', newline='') as csv_file:
+            with open(fname, "w", newline="") as csv_file:
                 writer = csv.writer(csv_file)
                 # Write the column headers
                 writer.writerow(columns)
@@ -202,16 +224,18 @@ class Writer:
         :param fitter: An object containing the necessary data (reactions, species, and energy values).
         :raises ValueError: If the 'variable' parameter is invalid.
         """
-        if variable == 'Reactions':
+        if variable == "Reactions":
             items = fitter.data.reactions.list
             energies = fitter.ga_fit
-            col = 'Activation energy [eV]'
-        elif variable == 'Species':
+            col = "Activation energy [eV]"
+        elif variable == "Species":
             items = fitter.data.species.adsorbed
             energies = fitter.gf_fit
-            col = 'Formation energy [eV]'
+            col = "Formation energy [eV]"
         else:
-            raise ValueError("The 'variable' parameter must be 'Reactions' or 'Species'.")
+            raise ValueError(
+                "The 'variable' parameter must be 'Reactions' or 'Species'."
+            )
 
         # Define table columns and rows
         columns = [variable, col]

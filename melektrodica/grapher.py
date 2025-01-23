@@ -34,7 +34,7 @@ class Grapher:
         self.species = self.data.species
         self.reactions = self.data.reactions
 
-        #self.graph_results(self.operation, self.species, self.results)
+        # self.graph_results(self.operation, self.species, self.results)
 
     def me(self):
         return r"$\mu$Elektrodica"
@@ -112,7 +112,9 @@ class Grapher:
             legends = Tool.format_latex_chemical(species.adsorbed)
             plt.ylabel(r"$\frac{\partial \theta_i}{\partial t}$")
         else:
-            legends = Tool.format_latex_chemical(species.reactants + species.products + species.adsorbed)
+            legends = Tool.format_latex_chemical(
+                species.reactants + species.products + species.adsorbed
+            )
             plt.ylabel(
                 r"$\frac{\partial \c_i}{\partial t}\ and\ \frac{\partial \theta_i}{\partial t}$"
             )
@@ -149,12 +151,14 @@ class Grapher:
         for calculator, (marker, linestyle, color) in collection.items():
             potential = calculator.operation.potential
             label = Tool.format_latex_chemical(calculator.data.species[subvariable])
-            ax.plot(potential, calculator.results[variable],
-                    label=label,
-                    marker=marker,
-                    linestyle=linestyle,
-                    color=color,
-                    )
+            ax.plot(
+                potential,
+                calculator.results[variable],
+                label=label,
+                marker=marker,
+                linestyle=linestyle,
+                color=color,
+            )
 
     def plot_coverages(self, collection, figname):
         fig = plt.figure()
@@ -168,15 +172,15 @@ class Grapher:
         fig.savefig(fname, dpi=300, bbox_inches="tight", format="png")
         plt.close(fig)
 
-    def plot_concentrations(self, collection, figname, role='Reactants'):
+    def plot_concentrations(self, collection, figname, role="Reactants"):
         global subvariable
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        if role == 'Reactants':
-            subvariable = 'reactants'
-        elif role == 'Products':
-            subvariable = 'products'
-        self.plot_results(ax, collection, 'c_' + subvariable, subvariable)
+        if role == "Reactants":
+            subvariable = "reactants"
+        elif role == "Products":
+            subvariable = "products"
+        self.plot_results(ax, collection, "c_" + subvariable, subvariable)
         ax.set_title("Coverages")
         ax.set_xlabel("Potential [V]")
         ax.set_ylabel(r"$\theta_j$")

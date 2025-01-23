@@ -79,7 +79,9 @@ class Coordinator:
         self.upsilon = copy.deepcopy(self.data.reactions.upsilon_c)
         self.species = copy.deepcopy(self.data.species.list)
         self.reactions = copy.deepcopy(self.data.reactions.list)
-        self.grafo = self.stoichiometric_graphe(self.upsilon, self.species, self.reactions)
+        self.grafo = self.stoichiometric_graphe(
+            self.upsilon, self.species, self.reactions
+        )
         self.paths = self.get_paths(self.grafo, source, target)
         self.pathways = self.get_pathways(self.grafo, self.paths)
         self.sigma = self.get_sigma(self.grafo, self.paths, self.reactions)
@@ -163,6 +165,13 @@ class Coordinator:
             constitute the path from the source to the target node.
         """
         paths = list(nx.all_simple_paths(graphe, source, target))
+        # Filter to prevent "short circuits"
+        for h, nodes in enumerate(paths):
+            for n in range(len(nodes) - 1):
+                reactant, product = nodes[n], nodes[n + 1]
+                if reactant == source and product == target:
+                    graphe.remove_edge(reactant, product)
+        paths = list(nx.all_simple_paths(graphe, source, target))
         return paths
 
     def get_pathways(self, graphe, paths):
@@ -200,7 +209,7 @@ class Coordinator:
                 reactant, product = nodes[n], nodes[n + 1]
                 edges = grafo[reactant][product]
                 key, data = list(edges.items())[-1]
-                reaction, upsilon = data['reaction'], data['upsilon']
+                reaction, upsilon = data["reaction"], data["upsilon"]
                 pathways[h].append(reaction)
                 if key != 0:
                     grafo.remove_edge(reactant, product, key=key)
@@ -245,7 +254,7 @@ class Coordinator:
                 reactant, product = nodes[n], nodes[n + 1]
                 edges = grafo[reactant][product]
                 key, data = list(edges.items())[-1]
-                reaction, upsilon = data['reaction'], data['upsilon']
+                reaction, upsilon = data["reaction"], data["upsilon"]
                 i = reactions.index(reaction)
                 sigma[h, i] = factor
                 factor *= upsilon[1]
@@ -286,7 +295,7 @@ class Coordinator:
 
         """
         dg = self.Kpy.get_argument(eta) * sigma
-        ddg = (dg[0, :] - dg[1, :])
+        ddg = dg[0, :] - dg[1, :]
         energies = np.zeros(2 * len(reactions) + 1)
         energies[0] = zero
         for i, reaction in enumerate(reactions):
@@ -342,28 +351,46 @@ class Coordinator:
         colors[0] = plt.cm.tab10(1)
         for j, eta in enumerate(potential):
             energies = self.get_energies(self.sigma[p], reactions, eta)
-            #print(f'eta = {eta} V, energies = {energies} eV,')
+            # print(f'eta = {eta} V, energies = {energies} eV,')
             color = colors[j]
             potential_legend.append(
-                Line2D([0], [0], linestyle="-", color=color, label=rf"$\eta = {eta}$ V")  # Assuming eta is a potential
+                Line2D(
+                    [0], [0], linestyle="-", color=color, label=rf"$\eta = {eta}$ V"
+                )  # Assuming eta is a potential
             )
             for i, g in enumerate(energies):
-                plt.plot([(i + 1 - plateau), (i + 1 + plateau)], [g, g], color=color, linewidth=2)
+                plt.plot(
+                    [(i + 1 - plateau), (i + 1 + plateau)],
+                    [g, g],
+                    color=color,
+                    linewidth=2,
+                )
                 if i <= len(energies) - 2:
-                    plt.plot([(i + 1 + plateau), (i + 2 - plateau)], [g, energies[i + 1]],
-                             linestyle=":", color=color, linewidth=0.5)
+                    plt.plot(
+                        [(i + 1 + plateau), (i + 2 - plateau)],
+                        [g, energies[i + 1]],
+                        linestyle=":",
+                        color=color,
+                        linewidth=0.5,
+                    )
         x_label = [""] * len(energies)
         x_label[0::2] = species
         x_label[1::2] = reactions
-        plt.plot([1 + plateau, 2 * len(reactions) + 1 + plateau], [0, 0], color='gray', linestyle="--", linewidth=1)
+        plt.plot(
+            [1 + plateau, 2 * len(reactions) + 1 + plateau],
+            [0, 0],
+            color="gray",
+            linestyle="--",
+            linewidth=1,
+        )
         plt.xlim(1 - plateau, 2 * len(reactions) + 1 + plateau)
         plt.xlabel("Reaction Coordinate")
         plt.ylabel(r"$\Delta G_{r,\xi_h}$ [eV]")
         plt.xticks(range(1, len(energies) + 1), x_label)
         plt.legend(handles=potential_legend)
         plt.minorticks_on()
-        #ax.tick_params(axis='both', which='both', direction='in')
-        ax.tick_params(axis='x', which='minor', bottom=False)
+        # ax.tick_params(axis='both', which='both', direction='in')
+        ax.tick_params(axis="x", which="minor", bottom=False)
         plt.tight_layout()
         plt.savefig(figname, dpi=300, bbox_inches="tight", format="png")
         plt.show()

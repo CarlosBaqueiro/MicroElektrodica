@@ -23,6 +23,7 @@ class Tool:
     ----------
     None
     """
+
     @staticmethod
     def unit_conversion(variable, value, unit_in, unit_out):
         """
@@ -102,32 +103,32 @@ class Tool:
     @staticmethod
     def begin():
         """
-            Print an introductory banner for the μElektrodica toolbox.
+        Print an introductory banner for the μElektrodica toolbox.
 
-            This method prints a formatted message containing the name, version, and
-            additional information about the μElektrodica electrochemistry toolbox. It is
-            designed to display an introductory banner when the toolbox starts.
+        This method prints a formatted message containing the name, version, and
+        additional information about the μElektrodica electrochemistry toolbox. It is
+        designed to display an introductory banner when the toolbox starts.
 
-            Parameters
-            ----------
-            None
+        Parameters
+        ----------
+        None
 
-            Returns
-            -------
-            None
+        Returns
+        -------
+        None
 
-            Notes
-            -----
-            The banner includes:
-            - Toolbox name: μElektrodica
-            - Version: 1.0.0
-            - Purpose: A Python Electrochemistry Toolbox for Modeling Microkinetic
-              Electrocatalytic Reactions
-            - Author credits: C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
-            - License information: CC BY-NC-SA 4.0
+        Notes
+        -----
+        The banner includes:
+        - Toolbox name: μElektrodica
+        - Version: 1.0.0
+        - Purpose: A Python Electrochemistry Toolbox for Modeling Microkinetic
+          Electrocatalytic Reactions
+        - Author credits: C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+        - License information: CC BY-NC-SA 4.0
 
-            This method relies on the `print_center` method from the `Tool` class to
-            display centered text for certain portions of the banner.
+        This method relies on the `print_center` method from the `Tool` class to
+        display centered text for certain portions of the banner.
         """
         print(f"\n")
         Tool.print_center("\u03BCElektrodica © 2024")
@@ -164,11 +165,13 @@ class Tool:
             for char in chem:
                 if char.isdigit():
                     formatted += f"_{char}"  # Usa subíndice en LaTeX
-                elif char == '+':
+                elif char == "+":
                     formatted += "^+"
                 else:
                     formatted += char
-            chemicals.append(f"$\\mathrm{{{formatted}}}$")  # Agregar delimitadores de LaTeX
+            chemicals.append(
+                f"$\\mathrm{{{formatted}}}$"
+            )  # Agregar delimitadores de LaTeX
         return chemicals
 
     @staticmethod

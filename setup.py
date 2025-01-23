@@ -26,7 +26,7 @@ setup(
         "networkx",
         "colorlog",
         "tabulate",
-        "IPython"
+        "IPython",
     ],
     python_requires=">=3.6",
 )

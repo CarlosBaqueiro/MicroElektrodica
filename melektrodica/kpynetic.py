@@ -7,6 +7,7 @@
         Kpynetic class
 
 """
+
 import copy
 import numpy as np
 from numpy import ndarray
@@ -75,7 +76,7 @@ class FreeEnergy:
         :return: The Gibbs free energy change for the reaction.
         :rtype: float
         """
-        #print(f'Kpynetic.FreeEnergy.reaction: \n upsilon = {upsilon}, g_formation = {g_formation}')
+        # print(f'Kpynetic.FreeEnergy.reaction: \n upsilon = {upsilon}, g_formation = {g_formation}')
         return -(upsilon @ g_formation)
 
 
@@ -121,7 +122,9 @@ class RateConstants:
         self.parameters = data.parameters
         self.reactions = data.reactions
 
-    def constant(self, pre_exponential=1, experimental=1, thermochemical=0, electronic=0):
+    def constant(
+        self, pre_exponential=1, experimental=1, thermochemical=0, electronic=0
+    ):
         """
         Calculates a reaction rate constants using the provided parameters.
 
@@ -146,9 +149,9 @@ class RateConstants:
         """
         self.argument = thermochemical + electronic
         return (
-                pre_exponential
-                * experimental
-                * np.exp(-self.argument / k_B / self.data.parameters.temperature)
+            pre_exponential
+            * experimental
+            * np.exp(-self.argument / k_B / self.data.parameters.temperature)
         )
 
     @staticmethod
@@ -514,10 +517,10 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             self.pre_exp = self.parameters.js_value / F
         if self.parameters.tst:
             self.pre_exp = (
-                    self.parameters.kappa
-                    * k_B
-                    * self.parameters.temperature ** self.parameters.m
-                    / h
+                self.parameters.kappa
+                * k_B
+                * self.parameters.temperature**self.parameters.m
+                / h
             )
 
         # Experimental
@@ -532,13 +535,15 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         if self.parameters.thermochemical:
             self.g_activation = self.reactions.ga
             self.g_formation = self.species.g_formation_ads
-            self.dg_reaction = FreeEnergy.reaction(self.reactions.upsilon_a, self.g_formation)
+            self.dg_reaction = FreeEnergy.reaction(
+                self.reactions.upsilon_a, self.g_formation
+            )
             self.thermochemical_part = RateConstants.thermochemical(
                 self.g_activation, self.g_formation, self.reactions.upsilon_a
             )
-            #if self.parameters.dg_reaction:
+            # if self.parameters.dg_reaction:
             #    self.dg_reaction = self.reactions.dg_reaction
-            #elif self.parameters.g_formation:
+            # elif self.parameters.g_formation:
 
     def foverpotential(self, potential, c_reactants, c_products, theta):
         """
@@ -607,10 +612,12 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         self.electronic_part = self.electrode * RateConstants.electronic(
             potential, self.reactions.ne, self.reactions.beta
         )
-        self.constant(pre_exponential=1, experimental=1,
-                      thermochemical=self.thermochemical_part,
-                      electronic=self.electronic_part,
-                      )
+        self.constant(
+            pre_exponential=1,
+            experimental=1,
+            thermochemical=self.thermochemical_part,
+            electronic=self.electronic_part,
+        )
         return self.argument
 
     def current(self, potential, c_reactants, c_products, theta):
