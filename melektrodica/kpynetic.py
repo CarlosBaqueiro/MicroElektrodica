@@ -313,7 +313,7 @@ class ReactionRate:
 
         The function calculates the empty sites on a catalytic surface based on the
         provided theta vector, which represents the coverage of various species on the
-        surface. The species' contribution is determined by the nu_catalyst matrix,
+        surface. The species' contribution is determined by the ns_catalyst matrix,
         which indicates the stoichiometric coefficients corresponding to the catalyst
         interaction.
 
@@ -439,7 +439,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         Reaction rates computed during runtime.
     """
 
-    def __init__(self, data):
+    def __init__(self, data, writer=None):
         """
         Initializes the kinetic model object for reaction simulation based on given data.
 
@@ -494,10 +494,11 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         dg_reaction : numpy.ndarray or None
             Free energy of reaction, derived from thermodynamic contributions if configured.
         """
-
-        self.writer = Writer()
-        self.writer.message(f"*** Kpynetic :  ***")
         self.data = copy.deepcopy(data)
+        if writer is None:
+            writer = Writer(log_file="melektrodica.log", log_directory=self.data.directory)
+        writer.message(f"*** Kpynetic :  ***")
+
         super().__init__(self.data)
         self.k_rate = None
         self.electronic_part = None
