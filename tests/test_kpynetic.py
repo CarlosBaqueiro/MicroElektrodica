@@ -2,7 +2,9 @@
 
 import numpy as np
 import unittest
+from unittest.mock import MagicMock
 from melektrodica.kpynetic import Kpynetic
+from melektrodica.writer import Writer
 
 
 class TestKpynetic(unittest.TestCase):
@@ -12,7 +14,7 @@ class TestKpynetic(unittest.TestCase):
     """
 
     class Parameters:
-        anode = False
+        anode = True
         pre_exponential = 1.0
         js = False
         js_value = 1.0
@@ -27,6 +29,7 @@ class TestKpynetic(unittest.TestCase):
         potential = 0.0
 
     class Species:
+        list = ['H2', 'H+', 'H*']
         nu_catalyst = np.array([[0.5], [0.2]])
 
     class Reactions:
@@ -44,10 +47,11 @@ class TestKpynetic(unittest.TestCase):
 
     def setUp(self):
         self.data = TestKpynetic.Data()
+        self.writer = MagicMock()
         self.kpynetic = Kpynetic(self.data)
 
     def test_initialization(self):
-        self.assertEqual(self.kpynetic.electrode, -1.0)
+        self.assertEqual(self.kpynetic.electrode, 1.0)
         self.assertEqual(self.kpynetic.pre_exp, 1.0)
         np.testing.assert_array_equal(
             self.kpynetic.eK, np.ones((2, len(self.data.reactions.list)))

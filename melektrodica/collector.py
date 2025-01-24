@@ -242,7 +242,7 @@ class DataSpecies:
             Logger or writer object for real-time messaging and updates during
             processing.
         """
-        writer.message(f"Reading Species data from file: {species_file}")
+        writer.message(f"Reading species data from file: {species_file}")
         header, raw_data = Collector.raw_data(species_file, writer=writer)
         Collector.column_exists("Species", header, species_file, writer)
         species_list = raw_data[:, header.index("Species")]
@@ -479,9 +479,10 @@ class Collector:
         Manages the reactions data extracted from a "reactions.md" file.
     """
 
-    def __init__(self, directory):
+    def __init__(self, directory, writer: object = None) -> None:
         self.directory = directory
-        writer = Writer(log_file="melektrodica.log", log_directory=self.directory)
+        if writer is None:
+            writer = Writer(log_file="melektrodica.log", log_directory=self.directory)
         writer.message("***  Collector  ***")
         self.parameters = DataParameters(
             os.path.join(directory, "parameters.md"), writer
@@ -576,8 +577,8 @@ class Collector:
         """
         if column_name not in header:
             writer.logger.critical(
-                f"ERROR Column 'DG_formation' not found in the {file_name} header."
+                f"ERROR: Required column '{column_name}' not found in the header of file '{file_name}'."
             )
             raise ValueError(
-                f"The required 'DG_formation' column is missing from the input file {file_name}. Please check the file."
+                f"Missing required column '{column_name}' in the header of file '{file_name}'."
             )
