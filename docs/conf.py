@@ -42,8 +42,6 @@ extensions = [
     "nbsphinx",
     "nbsphinx_link",
     "sphinxcontrib.bibtex",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.imgmath",
 ]
 
 napoleon_google_docstring = True

@@ -123,7 +123,7 @@ class RateConstants:
         self.reactions = data.reactions
 
     def constant(
-        self, pre_exponential=1, experimental=1, thermochemical=0, electronic=0
+            self, pre_exponential=1, experimental=1, thermochemical=0, electronic=0
     ):
         """
         Calculates a reaction rate constants using the provided parameters.
@@ -149,9 +149,9 @@ class RateConstants:
         """
         self.argument = thermochemical + electronic
         return (
-            pre_exponential
-            * experimental
-            * np.exp(-self.argument / k_B / self.data.parameters.temperature)
+                pre_exponential
+                * experimental
+                * np.exp(-self.argument / k_B / self.data.parameters.temperature)
         )
 
     @staticmethod
@@ -517,10 +517,10 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             self.pre_exp = self.parameters.js_value / F
         if self.parameters.tst:
             self.pre_exp = (
-                self.parameters.kappa
-                * k_B
-                * self.parameters.temperature**self.parameters.m
-                / h
+                    self.parameters.kappa
+                    * k_B
+                    * self.parameters.temperature ** self.parameters.m
+                    / h
             )
 
         # Experimental
