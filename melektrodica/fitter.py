@@ -37,7 +37,7 @@ class Fitter(Calculator):
     .. math::
 
             f(\\mathbf{p}) = \\min_{\\mathbf{p}} \\;\\frac{1}{2}
-                                \\sum \left[ \frac{J_{\text{exp}}(\eta)
+                                \\sum \left[ \frac{J_{\\text{exp}}(\\eta)
                                 -
                                 J_{\\text{model}}(\\eta,\\mathbf{p})}{J_{\\text{exp}}(\\eta)} \\right]^2
 
