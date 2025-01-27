@@ -35,7 +35,6 @@ class Ethanol:
         self.Kpy = Kpynetic(self.data)
         self.melek = Calculator(self.Kpy, "melek")
 
-
         # CSTR mode
         self.data_cstr = copy.deepcopy(self.data)
         self.data_cstr.parameters.cstr = True

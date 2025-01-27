@@ -5,6 +5,7 @@ setup(
     version="1.0.0",
     author="C. Baqueiro Basto, M. Secanell, L.C. Ordoñez",
     author_email="carlosbaqueirob@gmail.com",
+    url="https://github.com/CarlosBaqueiro/MicroElektrodica",
     description="A Python Electrochemistry Toolbox for Modeling Microkinetic Electrocatalytic Reactions",
     license="CC BY-NC-SA 4.0",
     long_description=open("README.md").read(),
