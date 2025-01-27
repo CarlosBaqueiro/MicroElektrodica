@@ -11,6 +11,7 @@
 import copy
 import os
 import numpy as np
+import csv
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
@@ -34,12 +35,11 @@ class Ethanol:
         self.Kpy = Kpynetic(self.data)
         self.melek = Calculator(self.Kpy, "melek")
 
-        writer.markdown("ethanol", "theta", self.melek)
 
         # CSTR mode
         self.data_cstr = copy.deepcopy(self.data)
         self.data_cstr.parameters.cstr = True
-        self.data_cstr.reactions.nux = self.data_cstr.reactions.nuc
+        self.data_cstr.reactions.upsilonx = self.data_cstr.reactions.upsilon_c
         self.data_cstr.parameters.Fv = 3e-4
         self.data_cstr.parameters.Ac = 1
         self.Kpy_cstr = Kpynetic(self.data_cstr)
@@ -259,6 +259,28 @@ class Ethanol:
             "CH$_3$": ("tab:red", ch3, 3),
             "OH": ("tab:purple", oh, 4),
         }
+        for label, (mark, linest, _data) in species.items():
+            output_dir = os.path.join(directory, "SanchezMonrealData")
+            os.makedirs(output_dir, exist_ok=True)
+            output_file = os.path.join(output_dir, f"coverages_{label}.csv")
+            print(label, mark, linest, _data)
+
+            # Validar que _data sea un iterable de iterables
+            if not hasattr(_data, "__iter__") or isinstance(_data, (int, float, str)):
+                # _data no es un iterable o es un dato simple, lo envolvemos en una lista de listas
+                _data = [[_data]]
+
+            # Validar que cada elemento interno sea también iterable
+            _data = [row if hasattr(row, "__iter__") and not isinstance(row, (str, bytes)) else [row] for row in _data]
+
+            with open(output_file, mode="w", newline="") as file:
+                writer = csv.writer(file)
+                # Escribir cabeceras
+                writer.writerow(
+                    ["Overpotential [V]", f"{label}*"])  # Opcional: Puedes personalizar los nombres de las columnas
+                # Escribir datos
+                writer.writerows(_data)
+            print(f"Archivo CSV creado: {output_file}")
 
         fname = os.path.join(directory, "SanchezEthanol_concentrations.png")
         plt.plot(

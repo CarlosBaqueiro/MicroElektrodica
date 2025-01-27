@@ -3,7 +3,7 @@
 #         Hydrogen oxidation reaction on Pt in acidic media: Adsorption isotherm and activation free energies.
 #         The Journal of Physical Chemistry C, 111(33), 12425-12433, https://doi.org/10.1021/jp073400i.
 # Data
-Overpotential [V],H*
+Overpotential [V],CO*
 7.92752e-03,6.55677e-01
 2.49151e-02,6.68118e-01
 4.07701e-02,6.65630e-01

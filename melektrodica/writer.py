@@ -128,7 +128,7 @@ class Writer:
             columns += [specie for specie in calculator.species.adsorbed]
             # Build rows with potential and theta values
             for potential, theta_values in zip(
-                calculator.potential, calculator.results.theta
+                    calculator.potential, calculator.results.theta
             ):
                 # Convert all values to scientific notation
                 formatted_row = [format_scientific(potential)] + [
@@ -185,7 +185,7 @@ class Writer:
             columns += [specie for specie in calculator.species.adsorbed]
             # Build rows with potential and theta values
             for potential, theta_values in zip(
-                calculator.potential, calculator.results.theta
+                    calculator.potential, calculator.results.theta
             ):
                 # Convert all values to scientific notation
                 formatted_row = [format_scientific(potential)] + [

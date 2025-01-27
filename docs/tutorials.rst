@@ -7,3 +7,4 @@ Tutorials
 
    Hydrogen Electro-Oxidation Reaction <tutorials/melektrodica_tutorial_hydrogen>
    Oxygen Electro-Reduction Reaction <tutorials/melektrodica_tutorial_oxygen>
+   Ethanol Electro-Oxidation Reaction <tutorials/melektrodica_tutorial_ethanol>
