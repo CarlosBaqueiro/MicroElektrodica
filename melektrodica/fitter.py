@@ -32,6 +32,15 @@ class Fitter(Calculator):
     for optimizing reaction and formation energies based on experimental data and
     implements utilities such as error tracking and optimization bounds.
 
+    The least-squares parameter estimation problem for determining kinetic parameters is formulated as:
+
+    .. math::
+
+            f(\\mathbf{p}) = \\min_{\\mathbf{p}} \\;\\frac{1}{2}
+                                \\sum \left[ \frac{J_{\text{exp}}(\eta)
+                                -
+                                J_{\\text{model}}(\\eta,\\mathbf{p})}{J_{\\text{exp}}(\\eta)} \\right]^2
+
     Attributes
     ----------
     name : str
