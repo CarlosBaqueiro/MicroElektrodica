@@ -484,13 +484,13 @@ class DynamicConcentration(BaseConcentration):
 
         c_reactants = variables[: len(self.species.reactants)]
         c_products = variables[
-            len(self.species.reactants) : -len(self.species.adsorbed)
-        ]
-        theta = variables[-len(self.species.adsorbed) :]
+                     len(self.species.reactants): -len(self.species.adsorbed)
+                     ]
+        theta = variables[-len(self.species.adsorbed):]
         return c_reactants, c_products, theta
 
     def right_hand_side(
-        self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
+            self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
     ) -> np.ndarray:
         """
         Computes the right-hand side of the set of differential equations governing the
