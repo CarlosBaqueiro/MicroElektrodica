@@ -24,7 +24,7 @@ class TestCollector(unittest.TestCase):
             "| Column1 | Column2 | Column3 |\n",
             "|---|---|---|\n",
             "| 1 | 2 | 3 |\n",
-            "| 4 | 5 | 6 |\n"
+            "| 4 | 5 | 6 |\n",
         ]
 
         # Create test directory if not exists
@@ -58,7 +58,9 @@ class TestCollector(unittest.TestCase):
     @patch("melektrodica.collector.DataParameters", autospec=True)
     @patch("melektrodica.collector.DataSpecies", autospec=True)
     @patch("melektrodica.collector.DataReactions", autospec=True)
-    def test_initialization(self, MockDataReactions, MockDataSpecies, MockDataParameters):
+    def test_initialization(
+        self, MockDataReactions, MockDataSpecies, MockDataParameters
+    ):
         # Mock the dependencies of the Collector class
         mock_parameters = MockDataParameters.return_value
         mock_species = MockDataSpecies.return_value
@@ -80,13 +82,15 @@ class TestCollector(unittest.TestCase):
             os.path.join(self.test_directory, "parameters.md"), self.writer
         )
         MockDataSpecies.assert_called_once_with(
-            os.path.join(self.test_directory, "species.md"), mock_parameters, self.writer
+            os.path.join(self.test_directory, "species.md"),
+            mock_parameters,
+            self.writer,
         )
         MockDataReactions.assert_called_once_with(
             os.path.join(self.test_directory, "reactions.md"),
             mock_parameters,
             mock_species,
-            self.writer
+            self.writer,
         )
 
     def test_raw_data_valid_file(self):
@@ -121,4 +125,6 @@ class TestCollector(unittest.TestCase):
     def test_column_exists_missing_column(self):
         # Test column exists functionality when column is missing
         with self.assertRaises(ValueError):
-            Collector.column_exists("MissingColumn", self.header, "test_file.md", self.writer)
+            Collector.column_exists(
+                "MissingColumn", self.header, "test_file.md", self.writer
+            )

@@ -11,7 +11,13 @@ class TestDataReactionsMarkdown(unittest.TestCase):
     """
 
     class ParametersMock:
-        def __init__(self, experimental=False, thermochemical=False, cstr=False, dg_reaction=False):
+        def __init__(
+            self,
+            experimental=False,
+            thermochemical=False,
+            cstr=False,
+            dg_reaction=False,
+        ):
             self.experimental = experimental
             self.thermochemical = thermochemical
             self.cstr = cstr
@@ -39,11 +45,11 @@ class TestDataReactionsMarkdown(unittest.TestCase):
         """
         # Use markdown-it or a custom approach to parse the table
         # Extract lines and differentiate headers and data
-        lines = md_content.strip().split('\n')
-        headers = [h.strip() for h in lines[0].split('|') if h.strip()]
+        lines = md_content.strip().split("\n")
+        headers = [h.strip() for h in lines[0].split("|") if h.strip()]
         data = []
         for row in lines[2:]:  # Skip header and separator lines
-            values = [v.strip() for v in row.split('|') if v.strip()]
+            values = [v.strip() for v in row.split("|") if v.strip()]
             data.append(values)
         return headers, np.array(data)
 
@@ -66,10 +72,16 @@ class TestDataReactionsMarkdown(unittest.TestCase):
 
         # Test initialization with parsed Markdown data
         self.parameters.thermochemical = True
-        DataReactions("test_reaction_file.md", self.parameters, self.species, self.writer)
+        DataReactions(
+            "test_reaction_file.md", self.parameters, self.species, self.writer
+        )
 
-        mock_column_exists.assert_any_call("Ga", headers, "test_reaction_file.md", self.writer)
-        self.writer.message.assert_called_with("Thermochemical reactions parameters processed.")
+        mock_column_exists.assert_any_call(
+            "Ga", headers, "test_reaction_file.md", self.writer
+        )
+        self.writer.message.assert_called_with(
+            "Thermochemical reactions parameters processed."
+        )
 
     def test_process_reaction_valid(self):
         side = "0.5O2 + Pt"

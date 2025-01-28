@@ -24,30 +24,31 @@ from .constants import F, k_B, h
 
 class FreeEnergy:
     """
-    Represents a thermodynamic system to calculate free energy changes.
+    Class representing an entity with initialization using the given data.
 
-    The FreeEnergy class provides a utility method to calculate
-    the Gibbs free energy change for a chemical reaction based on stoichiometric
-    coefficients and the Gibbs free energies of formation of the substances involved.
+    The class accepts a single argument during initialization and sets up
+    an internal representation of the provided data. This is typically
+    used as a base or utility class for more complex operations or data
+    management systems.
 
-    Attributes
-    ----------
-    data : objet
-        Placeholder for data storage related to the electrochemical system.
+    Attributes:
+        data: The data object provided during initialization, which is
+            stored internally for further operations or usage.
     """
 
-    def __init__(self, data):
+    def __init__(self, data: object):
         """
-        Represents a class designed to initialize and store data.
+        Class representing an entity with initialization using the given data.
 
-        This class serves as a basic container for the input data. It allows the
-        data to be initialized during the creation of an object and accessed
-        via corresponding attributes.
+        The class accepts a single argument during initialization and sets up
+        an internal representation of the provided data. This is typically
+        used as a base or utility class for more complex operations or data
+        management systems.
 
-        Attributes
-        ----------
-        data : objet
-            The data provided during initialization.
+        Attributes:
+            data: The data object provided during initialization, which is
+                stored internally for further operations or usage.
+
         """
         pass
 
@@ -124,7 +125,7 @@ class RateConstants:
 
     def constant(
             self, pre_exponential=1, experimental=1, thermochemical=0, electronic=0
-    ):
+    ) -> ndarray:
         """
         Calculates a reaction rate constants using the provided parameters.
 
@@ -155,7 +156,9 @@ class RateConstants:
         )
 
     @staticmethod
-    def experimental(forward_constants, backward_constants):
+    def experimental(
+            forward_constants: np.ndarray, backward_constants: np.ndarray
+    ) -> ndarray:
         """
         Construct an array combining forward and backward constants.
 
@@ -181,7 +184,9 @@ class RateConstants:
         return np.array([forward_constants, backward_constants])
 
     @staticmethod
-    def thermochemical(g_activation, g_formation, upsilon):
+    def thermochemical(
+            g_activation: np.ndarray, g_formation: np.ndarray, upsilon: np.ndarray
+    ) -> ndarray:
         """
         Calculates the thermochemical free energies based on activation energy, formation
         energy, and stoichiometric parameter.
@@ -214,7 +219,7 @@ class RateConstants:
         return np.array([g_activation, g_activation + dg_reaction])
 
     @staticmethod
-    def electronic(eta, ne, beta):
+    def electronic(eta: float, ne: np.ndarray, beta: np.ndarray) -> ndarray:
         """
         Computes the electronic energy and its complementary component based on the input parameters.
 
@@ -271,11 +276,11 @@ class ReactionRate:
         related information.
     """
 
-    def __init__(self, data):
+    def __init__(self, data: object):
         self.data = data
         self.species = data.species
 
-    def rate(self, k_rate, c_reactants, c_products, theta, upsilon):
+    def rate(self, k_rate, c_reactants, c_products, theta, upsilon) -> ndarray:
         """
         Calculate the reaction rate for a given reaction system.
 
@@ -307,7 +312,7 @@ class ReactionRate:
         rate = self.power_law(concentrations, upsilon)
         return np.sum(k_rate * rate, axis=0)
 
-    def empty_sites(self, theta):
+    def empty_sites(self, theta: np.ndarray) -> ndarray:
         """
         Computes the empty sites on a catalytic surface.
 
@@ -332,7 +337,9 @@ class ReactionRate:
 
         return np.array(1 - self.species.ns_catalyst @ theta)
 
-    def concentrate(self, c_reactants, c_products, theta):
+    def concentrate(
+            self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
+    ) -> ndarray:
         """
         Combine the concentrations of reactants, products, and other parameters into a single array.
 
@@ -439,7 +446,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         Reaction rates computed during runtime.
     """
 
-    def __init__(self, data, writer=None):
+    def __init__(self, data: object, writer=None):
         """
         Initializes the kinetic model object for reaction simulation based on given data.
 
@@ -496,7 +503,9 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         """
         self.data = copy.deepcopy(data)
         if writer is None:
-            writer = Writer(log_file="melektrodica.log", log_directory=self.data.directory)
+            writer = Writer(
+                log_file="melektrodica.log", log_directory=self.data.directory
+            )
         writer.message(f"*** Kpynetic :  ***")
 
         super().__init__(self.data)
@@ -546,7 +555,13 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             #    self.dg_reaction = self.reactions.dg_reaction
             # elif self.parameters.g_formation:
 
-    def foverpotential(self, potential, c_reactants, c_products, theta):
+    def foverpotential(
+            self,
+            potential: float,
+            c_reactants: np.ndarray,
+            c_products: np.ndarray,
+            theta: np.ndarray,
+    ) -> ndarray:
         """
         Calculate the overpotential and reaction rate within an electrochemical system.
 
@@ -592,7 +607,7 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
             self.k_rate, c_reactants, c_products, theta, self.reactions.upsilon
         )
 
-    def get_argument(self, potential):
+    def get_argument(self, potential: float):
         """
         Calculates and assigns the electronic part using the specified potential and reactions'
         parameters. Then computes and sets the necessary constant components required for
@@ -621,7 +636,13 @@ class Kpynetic(FreeEnergy, RateConstants, ReactionRate):
         )
         return self.argument
 
-    def current(self, potential, c_reactants, c_products, theta):
+    def current(
+            self,
+            potential: float,
+            c_reactants: np.ndarray,
+            c_products: np.ndarray,
+            theta: np.ndarray,
+    ) -> ndarray:
         """
         Calculates the kinetic current density.
 

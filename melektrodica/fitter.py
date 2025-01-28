@@ -264,7 +264,7 @@ class Fitter(Calculator):
         if isinstance(variables, tuple):
             variables = variables[0]
         a = variables[: len(self.data.reactions.list)]
-        f = variables[len(self.data.reactions.list):]
+        f = variables[len(self.data.reactions.list) :]
         return a, f
 
     def current_energies(self, *energies):
@@ -382,4 +382,4 @@ class Fitter(Calculator):
         self.Kpy.thermochemical_part = self.Kpy.thermochemical(
             self.ga_fit, self.gf_fit, self.results.data.reactions.upsilon_a
         )
-        return Calculator(self.Kpy, 'Fitter')
+        return Calculator(self.Kpy, "Fitter")
