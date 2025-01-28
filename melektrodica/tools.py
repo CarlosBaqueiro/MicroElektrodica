@@ -120,12 +120,12 @@ class Tool:
         Notes
         -----
         The banner includes:
-        - Toolbox name: μElektrodica
-        - Version: 1.0.0
-        - Purpose: A Python Electrochemistry Toolbox for Modeling Microkinetic
-          Electrocatalytic Reactions
-        - Author credits: C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
-        - License information: CC BY-NC-SA 4.0
+            - Toolbox name: μElektrodica
+            - Version: 1.0.0
+            - Purpose: A Python Electrochemistry Toolbox for Modeling Microkinetic
+              Electrocatalytic Reactions
+            - Author credits: C. Baqueiro Basto, M. Secanell, L.C. Ordoñez
+            - License information: CC BY-NC-SA 4.0
 
         This method relies on the `print_center` method from the `Tool` class to
         display centered text for certain portions of the banner.

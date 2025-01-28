@@ -40,6 +40,14 @@ class Fitter(Calculator):
                                 \\sum \left[\\frac{J_{\\text{exp}}(\\eta)
                                 -
                                 J_{\\text{model}}(\\eta,\\mathbf{p})}{J_{\\text{exp}}(\\eta)} \\right]^2
+    .. math::
+
+            \\text{w.r.t.:}\\quad \\mathbf{p} = \\{ G^{\circ}_{a,i}, \\, G^{\\circ}_j\\} \\quad \\forall \\, i, j
+
+    .. math::
+
+            \\text{s.t.:}\\quad \\mathbf{p} \\in \\mathbf{p}_0 \\cdot \\left[1 - b, \\, 1 + b\\right],
+                            \quad  b \\in [0,1].
 
     Attributes
     ----------
@@ -249,14 +257,14 @@ class Fitter(Calculator):
         -------
         tuple
             A tuple containing two elements:
-            - The first element is aligned in size with the length of
-              `self.data.reactions.list`.
-            - The second element contains the rest of the items beyond that length.
+                - The first element is aligned in size with the length of
+                  `self.data.reactions.list`.
+                - The second element contains the rest of the items beyond that length.
         """
         if isinstance(variables, tuple):
             variables = variables[0]
         a = variables[: len(self.data.reactions.list)]
-        f = variables[len(self.data.reactions.list) :]
+        f = variables[len(self.data.reactions.list):]
         return a, f
 
     def current_energies(self, *energies):

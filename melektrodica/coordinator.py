@@ -91,35 +91,29 @@ class Coordinator:
 
     def stoichiometric_graphe(self, upsilon, species, reactions):
         """
-        Generates a stoichiometric graph representing the relationships between reactants and
-        products for a set of chemical reactions.
+        Constructs a stoichiometric graph that represents the transformation of species through
+        a series of reactions. The graph edges represent the mapping of reactants to products
+        linked by a specific reaction and associated stoichiometric coefficients.
 
-        The function constructs a directed graph where nodes represent chemical species, and
-        edges represent reactions connecting reactants to products. Edge attributes include
-        the reaction identifier and stoichiometric coefficients of the reactant-product pair.
+        Parameters:
+            upsilon: numpy.ndarray
+                A 2D array representing stoichiometric coefficients for the reactions
+                with rows corresponding to reactions and columns to species.
+            species: list or array-like
+                An ordered collection of species identifiers corresponding to the
+                columns of the upsilon matrix.
+            reactions: list
+                A collection of identifiers for reactions corresponding to the rows
+                of the upsilon matrix.
 
-        Parameters
-        ----------
-        upsilon : np.ndarray
-            A 2D stoichiometric matrix where each row corresponds to a reaction, and each
-            column corresponds to a chemical species. Negative values indicate reactants,
-            positive values indicate products, and zero values imply no involvement of a
-            species in the reaction.
-        species : list of str
-            A list of chemical species identifiers (e.g., molecular names or symbols).
-            Each species corresponds to a column in the stoichiometric matrix.
-        reactions : list of str
-            A list of reaction identifiers or names corresponding to the rows of the
-            stoichiometric matrix.
+        Returns:
+            networkx.MultiDiGraph
+                A directed multigraph where nodes represent species and edges represent
+                the reactions. Edges are annotated with reaction IDs and their respective
+                stoichiometric coefficients.
 
-        Returns
-        -------
-        graphe : networkx.MultiDiGraph
-            A directed graph where each node represents a chemical species, and each edge
-            represents a reaction. The edge attributes include:
-            - 'reaction': The identifier or name of the reaction.
-            - 'upsilon': A list containing the stoichiometric coefficient of the reactant
-              and product for the reaction.
+        Raises:
+            None
         """
         graphe = nx.MultiDiGraph()
         species = np.array(species)

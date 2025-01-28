@@ -204,9 +204,9 @@ class RateConstants:
         -------
         numpy.ndarray
             A 1D array where:
-            - The first element is the activation energy (`g_activation`).
-            - The second element is the sum of the activation energy and the Gibbs free
-              energy of the reaction.
+                - The first element is the activation energy (`g_activation`).
+                - The second element is the sum of the activation energy and the Gibbs free
+                  energy of the reaction.
 
         """
 

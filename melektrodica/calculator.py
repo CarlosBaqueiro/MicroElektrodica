@@ -332,11 +332,11 @@ class StaticConcentration(BaseConcentration):
         -------
         tuple of (ndarray, ndarray)
             A tuple containing:
-            - fval : ndarray
-                A 2D array of zeros with shape corresponding to the number of potentials
-                and the number of adsorbed species.
-            - initio : ndarray
-                A 1D array of zeros concatenated from adsorption species initial states.
+                - fval : ndarray
+                    A 2D array of zeros with shape corresponding to the number of potentials
+                    and the number of adsorbed species.
+                - initio : ndarray
+                    A 1D array of zeros concatenated from adsorption species initial states.
         """
 
         fval = np.zeros((len(self.operation.potential), len(self.species.adsorbed)))
@@ -362,9 +362,9 @@ class StaticConcentration(BaseConcentration):
         -------
         tuple
             A tuple containing:
-            - c_reactants: The initial concentrations for reactants.
-            - c_products: The initial concentrations for products.
-            - theta: The unpacked variable from the input variables.
+                - c_reactants: The initial concentrations for reactants.
+                - c_products: The initial concentrations for products.
+                - theta: The unpacked variable from the input variables.
 
         """
 
@@ -439,7 +439,6 @@ class DynamicConcentration(BaseConcentration):
             reactants (set to ones), products (set to zeros), and adsorbed species
             (set to zeros).
         """
-
         fval = np.zeros(
             (
                 len(self.operation.potential),
@@ -475,23 +474,23 @@ class DynamicConcentration(BaseConcentration):
         -------
         tuple
             A tuple containing three elements:
-            - c_reactants : list
-                Concentrations of reactant species.
-            - c_products : list
-                Concentrations of product species.
-            - theta : list
-                Fractional surface coverage of adsorbed species.
+                - c_reactants : list
+                    Concentrations of reactant species.
+                - c_products : list
+                    Concentrations of product species.
+                - theta : list
+                    Fractional surface coverage of adsorbed species.
         """
 
         c_reactants = variables[: len(self.species.reactants)]
         c_products = variables[
-            len(self.species.reactants) : -len(self.species.adsorbed)
-        ]
-        theta = variables[-len(self.species.adsorbed) :]
+                     len(self.species.reactants): -len(self.species.adsorbed)
+                     ]
+        theta = variables[-len(self.species.adsorbed):]
         return c_reactants, c_products, theta
 
     def right_hand_side(
-        self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
+            self, c_reactants: np.ndarray, c_products: np.ndarray, theta: np.ndarray
     ) -> np.ndarray:
         """
         Computes the right-hand side of the set of differential equations governing the

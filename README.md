@@ -4,6 +4,12 @@
 
 Uxmal 1.0.0
 
+[![CI](https://github.com/CarlosBaqueiro/MicroElektrodica/actions/workflows/test.yml/badge.svg)](https://github.com/CarlosBaqueiro/MicroElektrodica/actions/workflows/test.yml)
+[![License](https://img.shields.io/github/license/CarlosBaqueiro/MicroElektrodica)](https://github.com/CarlosBaqueiro/MicroElektrodica/blob/main/LICENSE)
+
+
+
+
 A Python Electrochemistry Toolbox for Modeling Microkinetic Electrocatalytic Reactions.
 The package provides example datasets and tutorials designed to demonstrate how the functions can be utilized.
 
