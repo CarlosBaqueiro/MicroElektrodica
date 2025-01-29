@@ -269,7 +269,7 @@ class DataSpecies:
             raw_data[:, header.index("c0")][raw_data[:, index] == "P"].astype(float)
         )
         self.list = (
-            self.reactants + self.products + self.adsorbed + self.catalyst + ["e-"]
+                self.reactants + self.products + self.adsorbed + self.catalyst + ["e-"]
         )
         writer.message("Initial concentrations processed.")
 
@@ -282,7 +282,7 @@ class DataSpecies:
         for i in range(len(self.catalyst)):
             species_in_catalyst = species_list[
                 raw_data[:, header.index("Catalyst")] == self.catalyst[i]
-            ]
+                ]
             nsites = sites[raw_data[:, header.index("Catalyst")] == self.catalyst[i]]
             for specie, ns in zip(species_in_catalyst, nsites):
                 if specie in self.adsorbed:
@@ -295,17 +295,17 @@ class DataSpecies:
                 self.g_formation_rct = np.array(
                     raw_data[:, header.index("DG_formation")][
                         raw_data[:, index] == "R"
-                    ].astype(float)
+                        ].astype(float)
                 )
                 self.g_formation_ads = np.array(
                     raw_data[:, header.index("DG_formation")][
                         raw_data[:, index] == "A"
-                    ].astype(float)
+                        ].astype(float)
                 )
                 self.g_formation_prd = np.array(
                     raw_data[:, header.index("DG_formation")][
                         raw_data[:, index] == "P"
-                    ].astype(float)
+                        ].astype(float)
                 )
             writer.message("Formation energies processed")
 
@@ -347,7 +347,7 @@ class DataReactions:
     """
 
     def __init__(
-        self, reaction_file: str, parameters: object, species: object, writer: object
+            self, reaction_file: str, parameters: object, species: object, writer: object
     ) -> None:
         writer.message(f"Reading Reactions data from file: {reaction_file}")
         header, raw_data = Collector.raw_data(reaction_file, writer=writer)
@@ -377,11 +377,11 @@ class DataReactions:
         self.ne = self.upsilon[:, -1]  # Number of electrons transferred
         self.upsilon = self.upsilon[:, :-1]  # All coefficients, catalysts included
         self.upsilon_c = self.upsilon[
-            :, : -len(species.catalyst)
-        ]  # All coefficients, without catalysts
+                         :, : -len(species.catalyst)
+                         ]  # All coefficients, without catalysts
         self.upsilon_a = self.upsilon_c[
-            :, -len(species.adsorbed) :
-        ]  # Adsorbates coefficients
+                         :, -len(species.adsorbed):
+                         ]  # Adsorbates coefficients
         writer.message("Reaction matrix processed.")
 
         if parameters.cstr:
@@ -548,7 +548,7 @@ class Collector:
 
     @staticmethod
     def column_exists(
-        column_name: str, header: list[str], file_name: str, writer: object
+            column_name: str, header: list[str], file_name: str, writer: object
     ):
         """
         Check if a specific column exists within a given header and log an error if it does not.

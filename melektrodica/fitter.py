@@ -264,7 +264,7 @@ class Fitter(Calculator):
         if isinstance(variables, tuple):
             variables = variables[0]
         a = variables[: len(self.data.reactions.list)]
-        f = variables[len(self.data.reactions.list):]
+        f = variables[len(self.data.reactions.list) :]
         return a, f
 
     def current_energies(self, *energies):

@@ -73,5 +73,6 @@ class TestFreeEnergy(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.FreeEnergy.reaction(upsilon, G_formation)
 
+
 if __name__ == "__main__":
     unittest.main()

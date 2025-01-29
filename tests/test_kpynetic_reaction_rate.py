@@ -23,14 +23,22 @@ class TestReactionRate(unittest.TestCase):
         c_products = np.array([0.8, 1.2])
         theta = np.array([0.2, 0.3])
         upsilon = np.array([-1.0, -2.0, 1.0, 0.0, 2.0, 2.0, -1.0])
-        empty_sites = np.array([1-1.0*0.2-2.0*0.3])
+        empty_sites = np.array([1 - 1.0 * 0.2 - 2.0 * 0.3])
         concentration = np.concatenate((c_reactants, c_products, theta, empty_sites))
         self.reaction_rate.concentrate = MagicMock(return_value=concentration)
-        power_law = np.array([1.5**1*2.5**2*empty_sites[0]**1, 0.8**1*1.2**0*0.2**2*0.3**2])
+        power_law = np.array(
+            [1.5 ** 1 * 2.5 ** 2 * empty_sites[0] ** 1, 0.8 ** 1 * 1.2 ** 0 * 0.2 ** 2 * 0.3 ** 2]
+        )
         self.reaction_rate.power_law = MagicMock(return_value=power_law)
-        result = self.reaction_rate.rate(k_rate, c_reactants, c_products, theta, upsilon)
-        self.reaction_rate.concentrate.assert_called_once_with(c_reactants, c_products, theta)
-        self.reaction_rate.power_law.assert_called_once_with(self.reaction_rate.concentrate.return_value, upsilon)
+        result = self.reaction_rate.rate(
+            k_rate, c_reactants, c_products, theta, upsilon
+        )
+        self.reaction_rate.concentrate.assert_called_once_with(
+            c_reactants, c_products, theta
+        )
+        self.reaction_rate.power_law.assert_called_once_with(
+            self.reaction_rate.concentrate.return_value, upsilon
+        )
         np.testing.assert_array_equal(result, np.sum(k_rate * power_law))
 
     def test_powerlaw_positive_upsilon(self):
@@ -71,12 +79,13 @@ class TestReactionRate(unittest.TestCase):
 
     def test_power_law(self):
         concentration = np.array([0.1, 2.0])
-        upsilon = np.array([[-1.0, 2.0],
-                            [3.0, -4.0]])
-        expected_result = np.array([
-            [np.prod([0.1 ** 1.0]), -np.prod([2.0 ** 2.0])],
-            [np.prod([2.0 ** 4.0]), -np.prod([0.1 ** 3.0])]
-        ]).T
+        upsilon = np.array([[-1.0, 2.0], [3.0, -4.0]])
+        expected_result = np.array(
+            [
+                [np.prod([0.1 ** 1.0]), -np.prod([2.0 ** 2.0])],
+                [np.prod([2.0 ** 4.0]), -np.prod([0.1 ** 3.0])],
+            ]
+        ).T
         result = self.reaction_rate.power_law(concentration, upsilon)
         np.testing.assert_array_almost_equal(result, expected_result, decimal=6)
 
